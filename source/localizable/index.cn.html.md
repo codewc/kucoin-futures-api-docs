@@ -698,6 +698,35 @@ symbol | 合约symbol |
 leverage | 用户当前杠杆 | 
 maxRiskLimit | 该杠杆下持仓最大限额 | 
 
+## 获取用户全局杠杆(所有合约)
+```json
+{
+"code": "200000",
+"data": [
+{
+"symbol": "ETHUSDTM",
+"leverage": "5",
+"maxRiskLimit": "10000000"
+},
+{
+"symbol": "BTCUSDTM",
+"leverage": "5",
+"maxRiskLimit": "20000000"
+}
+]
+}
+```
+### HTTP请求
+GET /api/v2/user-config/leverages
+### 参数
+无
+### 返回值
+属性 | 含义 |
+--------- | -----------|
+symbol | 合约symbol |
+leverage | 用户当前杠杆 |
+maxRiskLimit | 该杠杆下持仓最大限额 |
+
 ## 修改用户全局杠杆
 ```json
 {
