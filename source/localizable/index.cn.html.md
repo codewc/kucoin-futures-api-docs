@@ -2324,91 +2324,33 @@ ID用于标识请求和ack的唯一字符串。
 
 # 公共频道
 
-## 交易实时行情 ticker v2
-
-```json
-  {
-    "id": 1545910660740,                          
-    "type": "subscribe",
-    "topic": "/contractMarket/tickerV2:XBTUSDM",
-    "response": true                              
-  }
-```
-
-Topic: **/contractMarket/tickerV2:{symbol}**
-
-```json
-  {
-    "subject": "tickerV2",
-    "topic": "/contractMarket/tickerV2:XBTUSDM",
-    "data": {
-      "symbol": "XBTUSDM",					// 行情
-      "bestBidSize": 795,					// 最佳买一价总数量
-      "bestBidPrice": 3200.00,			// 最佳买一价
-      "bestAskPrice": 3600.00,			// 最佳卖一价
-      "bestAskSize": 284,					// 最佳卖一价总数量
-      "ts": 1553846081210004941		// 成交时间 - 纳秒
-   }
-  }
-```
-订阅此topic，可获取指定交易对的最佳买一和卖一价（BBO）的数据推送。
-
-每当买卖盘有变化时，推送实时ticker。v2版本推送更具有实时性，推荐接入该版本。
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
 ## 交易实时行情 ticker
-
 ```json
   {
     "id": 1545910660740,                          
     "type": "subscribe",
-    "topic": "/contractMarket/ticker:XBTUSDM",
+    "topic": "/futuresMarket/ticker:XBTUSDM",
     "response": true                              
   }
 ```
 
-Topic: **/contractMarket/ticker:{symbol}**
+Topic: **/futuresMarket/ticker:{symbol}**
 
 ```json
   {
     "subject": "ticker",
-    "topic": "/contractMarket/ticker:XBTUSDM",
+    "topic": "/futuresMarket/ticker:XBTUSDM",
     "data": {
       "symbol": "XBTUSDM",					// 行情
-      "sequence": 45,						// 顺序号，用于判断消息连续
-      "side": "sell",						// 最新成交的taker方向
-      "price": 3600.00,					// 成交价格
-      "size": 16,							// 成交数量
-      "tradeId": "5c9dcf4170744d6f5a3d32fb",    // 订单号
       "bestBidSize": 795,					// 最佳买一价总数量
       "bestBidPrice": 3200.00,			// 最佳买一价
       "bestAskPrice": 3600.00,			// 最佳卖一价
       "bestAskSize": 284,					// 最佳卖一价总数量
-      "ts": 1553846081210004941		// 成交时间 - 纳秒
+      "ts": 1650447469782		// 成交时间 - 毫秒
    }
   }
 ```
 订阅此topic，可获取指定交易对的最佳买一和卖一价（BBO）的数据推送。
-
-每完成一笔撮合，该渠道就会实时推送一次价格。如果有多个订单在同一时间被撮合，仅推送最近一笔完成撮合的订单事件。
-
-该推送已不推荐使用，获取实时的ticker，请订阅 /contractMarket/tickerV2:{symbol}。
-
 <br/>
 <br/>
 <br/>
@@ -2431,12 +2373,12 @@ Topic: **/contractMarket/ticker:{symbol}**
   {
     "id": 1545910660740,                          
     "type": "subscribe",
-    "topic": "/contractMarket/level2:XBTUSDM",
+    "topic": "/futuresMarket/level2:XBTUSDM",
     "response": true                              
   }
 ```
 
-Topic：**/contractMarket/level2:{symbol}**
+Topic：**/futuresMarket/level2:{symbol}**
 
 订阅此topic，获取Level 2买卖盘数据。
 
@@ -2445,129 +2387,53 @@ Topic：**/contractMarket/level2:{symbol}**
 ```json
   {
     "subject": "level2",
-    "topic": "/contractMarket/level2:XBTUSDM",
+    "topic": "/futuresMarket/level2:XBTUSDM",
     "type": "message",
     "data": {
-      "sequence": 18,					// 顺序号，用于判断消息连续
-      "change": "5000.0,sell,83"		// 价格、方向、数量
-      "timestamp": 1551770400000 
-      
+      "start":20711,
+      "end":20712,
+      "bids":[],
+      "asks":[["14.250",30]],
+      "ts":1650447324950
       }
   }
 ```
 
 校准流程：
 
-1. 将Websocket推送的Level 2数据缓存在本地。
-2. 通过REST请求拉取[Level 2](#获取全部买卖盘-level-2)买卖盘的快照信息。
-3. 回放缓存的Level 2数据流。
-4. 将拉取的最新Level 2数据流回放到本地缓存中，以确保最新的Level 2买卖盘数据顺序号与之前的Level 2数据顺序号连续无间断。丢弃掉旧Level 2数据该顺序号之前的数据，更新Level 2数据流。
-5. 请根据订单数量对应的顺序号更新Level 2的全部买卖盘数据。如果数量为0，则需要将该数量对应的订单价格从Level 2数据流中移除。如遇其他情况，正常更新买卖盘数据即可。
-6. 如果收到的消息的sequence与上一条消息不连续，可通过REST请求(GET /api/v1/level2/message/query), start和end间隔不超过500。
-[Level 2](#level-2消息拉取) 的Change属性是一个“price, size, sequence”的字符串值。请注意，size指的是price对应的最新size。当size为0时，需要将其对应的price从买卖盘中删除。
+1. 订阅 /futuresMarket/level2:BTCUSDTM
+2. 开始缓存收到的更新。同一个价位，后收到的更新覆盖前面的。
+3. 访问Rest接口 /v2/order-book?symbol=BTCUSDTM&limit=1000获得一个1000档的深度快照
+4. 将目前缓存到的信息中end< 步骤3中获取到的快照中的start的部分丢弃(丢弃更早的信息，已经过期)
+5. 将深度快照中的内容更新到本地orderbook副本中，本地保存lastUpdateId=最后一个增量消息的end，并从websocket接收到的第一个start <= lastUpdateId 且 end > lastUpdateId 的event开始继续更新本地副本。
+6. 每一个新的event的start应该小于或等于上一个event的end,否则可能出现了丢包，请从step3重新进行初始化。
+7. 每一个event中的挂单量代表这个价格目前的挂单量绝对值，而不是相对变化。
+8. 如果某个价格对应的挂单量为0，表示该价位的挂单已经撤单或者被吃，应该移除这个价位。
 
-**示例**
-
-通过REST请求（Get Order Book）拉取[Level 2](#获取全部买卖盘-level-2)买卖盘的快照信息。获取的快照信息如下：
-
-
-Sequence：**16**
-
-``` json
-  {
-    "sequence": 16,
-    "asks":[
-      ["3988.59",3],
-      ["3988.60",47],
-      ["3988.61",32],
-      ["3988.62",8]
-    ],
-    "bids":[
-      ["3988.51",56],
-      ["3988.50",15],
-      ["3988.49",100],
-      ["3988.48",10]
-    ]
-  }
-```
-
-如上所示，当前拉取的买卖盘快照数据如下：
-
-| 价格   | 数量 | 方向 |
-| ------- | ---- | ---- |
-| 3988.62 | 8    | 卖4 |
-| 3988.61 | 32   | 卖3 |
-| 3988.60 | 47   | 卖2 |
-| 3988.59 | 3    | 卖1 |
-| 3988.51 | 56   | 买1 |
-| 3988.50 | 15   | 买2  |
-| 3988.49 | 100  | 买3  |
-| 3988.48 | 10   | 买4  |
-
-订阅成功后，您将收到如下变更消息：
-
-``` json
-  "data": {
-    "sequence": 17,
-    "change": "3988.50,buy,44"     // 价格、方向、数量
-  }
-```
-``` json
-  "data": {
-    "sequence": 18,
-    "change": "3988.61,sell,0"     // 价格、方向、数量
-  }
-```
-
-当前买卖盘快照信息的顺序号为16。丢弃买卖盘数据中顺序号小于等于16的数据，回放顺序号为17和18的数据，并更新买卖盘快照信息。现在，您的顺序号变成了18，本地买卖盘已最新。
-
-**变更**
-
-1. **将价格3988.50对应的数量变更为44 （顺序号为17）**
-2. **移除价格为3988.61的数据（顺序号为8）**
-
-
-变更后，当前买卖盘数据为最新数据，具体数据如下：
-
-| 价格   | 数量 | 方向 |
-| ------- | ---- | ---- |
-| 3988.62 | 8    | 卖3 |
-| 3988.60 | 47   | 卖2 |
-| 3988.59 | 3    | 卖1 |
-| 3988.51 | 56   | 买1  |
-| 3988.50 | 44   | 买2  |
-| 3988.49 | 100  | 买3  |
-| 3988.48 | 10  | 买4  |
 
 ## 成交记录 
-
 ```json
   {
     "id": 1545910660741,                          
     "type": "subscribe",
-    "topic": "/contractMarket/execution:XBTUSDM",
+    "topic": "/futuresMarket/execution:XBTUSDM",
     "response": true                              
   }
 ```
-Topic: **/contractMarket/execution:{symbol}**
+Topic: **/futuresMarket/execution:{symbol}**
 
 每撮合一笔订单，系统就会按照如下格式向您推送消息：
-
 ```json
  {
-   "topic": "/contractMarket/execution:XBTUSDM",
-   "subject": "match",
+   "topic": "/futuresMarket/execution:XBTUSDM",
+   "subject": "execution",
    "data": {
         "symbol": "XBTUSDM",				// 合约
-        "sequence": 36,						// 顺序号，用于判断websocket消息连续
-        "side": "buy",						//  taker的方向 
-        "matchSize": 1,           // 成交数量
+        "matchSide": "sell",           // 成交方向 buy/sell
         "size": 1,							// 订单剩余数量
         "price": 3200.00,					// 成交价格
-        "takerOrderId": "5c9dd00870744d71c43f5e25",  // taker方订单ID
-        "time": 1553846281766256031,		             // 成交时间 - 纳秒
-        "makerOrderId": "5c9d852070744d0976909a0c",  // maker方订单ID
-        "tradeId": "5c9dd00970744d6f5a3d32fc"        // 交易号
+        "tradeId": 21518,  // 成交编号
+        "ts": 1650447324950       // 时间毫秒
     }
  }
 ```
@@ -2576,14 +2442,15 @@ Topic: **/contractMarket/execution:{symbol}**
 
 ## level2的5档全量数据推送频道 
 
-Topic: **/contractMarket/level2Depth5:{symbol}**
+Topic: **/futuresMarket/level2Depth5:{symbol}**
 
 ```json
 {
    "type": "message",
-   "topic": "/contractMarket/level2Depth5:XBTUSDM",
-   "subject": "level2",
+   "topic": "/futuresMarket/level2Depth5:BTCUSDM",
+   "subject": "level2Depth5",
    "data": {
+       "sequence":243,
        "asks":[
          ["9993", "3"],
          ["9992", "3"],
@@ -2599,10 +2466,9 @@ Topic: **/contractMarket/level2Depth5:{symbol}**
          ["9984", "10"]
   
        ],
-         "ts": 1590634672060667000
+       "ts": 1650447324950       // 时间毫秒
     }
  }
-
 ```
 推送频率为最多100ms一次。
 
@@ -2634,32 +2500,33 @@ Topic: **/contractMarket/level2Depth5:{symbol}**
 
 ## level2的50档全量数据推送频道
 
-Topic: **/contractMarket/level2Depth50:{symbol}**
+Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 ```json
 {
    "type": "message",
-   "topic": "/contractMarket/level2Depth50:XBTUSDM",
-   "subject": "level2",
+   "topic": "/futuresMarket/level2Depth50:BTCUSDM",
+   "subject": "level2Depth5",
    "data": {
+       "sequence":243,
        "asks":[
-         ["9993",3],
-         ["9992",3],
-         ["9991",47],
-         ["9990",32],
-         ["9989",8]
+         ["9993", "3"],
+         ["9992", "3"],
+         ["9991", "47"],
+         ["9990", "32"],
+         ["9989", "8"]
        ],
        "bids":[
-         ["9988",56],
-         ["9987",15],
-         ["9986",100],
-         ["9985",10],
-         ["9984",10]
+         ["9988", "56"],
+         ["9987", "15"],
+         ["9986", "100"],
+         ["9985", "10"],
+         ["9984", "10"]
+  
        ],
-        "ts": 1590634672060667000
+       "ts": 1650447324950       // 时间毫秒
     }
-}
-
+ }
 ```
 推送频率为最多100ms一次。
 <br/>
@@ -2685,245 +2552,49 @@ Topic: **/contractMarket/level2Depth50:{symbol}**
 
 
 
-
-## 产品行情数据
-Topic： **/contract/instrument:{symbol}**
-订阅此topic，可获取指定合约产品的行情数据。
-
-```json
- //产品行情数据
-  { 
-    "id": 1545910660742,                          
-    "type": "subscribe",
-    "topic": "/contract/instrument:XBTUSDM",   
-    "response": true                              
-  }
-```
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 标记价格、指数价格
-
+## 标记价格、指数价格
 ```json
   //标记价格、指数价格
-  { 
-    "topic": "/contract/instrument:XBTUSDM",
-    "subject": "mark.index.price",
-    "data": {
-        "granularity": 1000,           //粒度
-        "indexPrice": 4000.23,            //指数价格
-        "markPrice": 4010.52,           //标记价格
-        "timestamp": 1551770400000
-    }
-  }
-```
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 资金费率
-
-```json
- //资金费率
-  { 
-    "topic": "/contract/instrument:XBTUSDM",
-    "subject": "funding.rate",
-    "data": {
-        "granularity": 60000,  //粒度(预测资金费率：1分钟粒度60000; 资金费率: 8小时粒度28800000)
-        "fundingRate": -0.002966,     //资金费率
-        "timestamp": 1551770400000
-    }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-## 系统公告
-topic:  **/contract/announcement**
-订阅此topic，可获取系统公告的推送。
-
-```json
- //系统公告
-  { 
-    "id": 1545910660742,                          
-    "type": "subscribe",
-    "topic": "/contract/announcement",   
-    "response": true                              
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 资金费用结算开始
-
-```json
- //资金费用结算开始
-  { 
-    "topic": "/contract/announcement",
-    "subject": "funding.begin",
-    "data": {
-        "symbol": "XBTUSDM",                   //合约symbol
-        "fundingTime": 1551770400000,          //费用时间
-        "fundingRate": -0.002966,             //资金费率
-        "timestamp": 1551770400000
-    }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 资金费用结算结束
-
-```json
-  //资金费用结算结束
-  { 
-    "type":"message",
-    "topic": "/contract/announcement",
-    "subject": "funding.end",
-    "data": {
-        "symbol": "XBTUSDM",                   //合约symbol
-        "fundingTime": 1551770400000,          //费用时间
-        "fundingRate": -0.002966,            //资金费率
-        "timestamp": 1551770410000          
-    }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-## 交易统计定时触发事件
-每 5 秒定时触发交易统计信息推送。
-
-```json
-  //交易统计定时触发事件
-  { 
-    "topic": "/contractMarket/snapshot:XBTUSDM",
-    "subject": "snapshot.24h",
-    "data": {
-        "volume": 30449670,            //24小时成交量
-        "turnover": 845169919063,      //24小时成交额
-        "lastPrice": 3551,           //最新成交价
-        "priceChgPct": 0.0043,         //24小时涨跌幅
-        "ts": 1547697294838004923      //快照时间，精确到纳秒
-    }  
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-
-
-# 私有消息
-
-## 订单私有消息-按照市场独立推送
-```json
 {
-   "type": "message",
-   "topic": "/contractMarket/tradeOrders:XBTUSDM",
-   "subject": "symbolOrderChange",
-   "channelType": "private",
-   "data": {
-       "orderId": "5cdfc138b21023a909e5ad55", //订单号
-       "symbol": "XBTUSDM",  //合约symbol
-       "type": "match",  //消息类型，取值列表: "open", "match", "filled", "canceled", "update" 
-       "status": "open", //订单状态: "match", "open", "done"
-       "matchSize": "", //成交数量 (当类型为"match"时包含此字段) 
-       "matchPrice": "",//成交价格 (当类型为"match"时包含此字段) 
-       "orderType": "limit", //订单类型, "market"表示市价单", "limit"表示限价单 
-       "side": "buy",  // 订单方向，买或卖 
-       "price": "3600",  //订单价格
-       "size": "20000",  //订单数量
-       "remainSize": "20001",  //订单剩余可用于交易的数量
-       "filledSize":"20000",  //订单已成交的数量
-       "canceledSize": "0",  //  update消息中，订单减少的数量
-       "tradeId": "5ce24c16b210233c36eexxxx",  //交易号(当类型为"match"时包含此字段) 
-       "clientOid": "5ce24c16b210233c36ee321d", //用户自定义ID 
-       "orderTime": 1545914149935808589,  // 下单时间 
-       "oldSize ": "15000", // 更新前的数量(当类型为"update"时包含此字段) 
-       "liquidity": "maker", // 成交方向，取taker一方的买卖方向 
-       "ts": 1545914149935808589 // 时间戳
-   }
+    "type":"message",
+    "topic": "/futuresContract/markPrice",
+    "subject": "mark.index.price",
+    "sn": 123123,
+    "data": {
+      "symbol": "XBTUSDM", //
+      "granularity": 1000, //粒度
+      "indexPrice": 4000.23, //指数价格
+      "markPrice": 4010.52, //标记价格
+      "ts": 1551770400000
+    }
 }
 ```
-**订单状态** 
-   "match": 订单为taker时与买卖盘中订单成交，此时该taker订单状态为match；
-   "open": 订单存在于买卖盘中；  
-   "done": 订单完成；
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
-**消息类型**
-   "open": 订单进入买卖盘时发出的消息；  
-   "match": 订单成交时发出的消息；
-   "filled": 订单因成交后状态变为DONE时发出的消息；
-   "canceled": 订单因被取消后状态变为DONE时发出的消息；
-   "update": 订单因被修改发出的消息；
+
+## 资金费率
+```json
+ //资金费率
+{
+    "type":"message",
+    "topic": "/futuresContract/fundingRate:XBTUSDM",
+    "subject": "funding.rate",
+    "sn": 25997405694459904,
+    "data": {
+      "granularity": 60000, //粒度(预测资金费率：1分钟粒度60000; 资金费率: 8小时粒度28800000)
+      "fundingRate": -0.002966, //资金费率
+      "ts": 1551770400000
+    }
+}
+```
+
 <br/>
 <br/>
 <br/>
@@ -2935,66 +2606,50 @@ topic:  **/contract/announcement**
 <br/>
 <br/>
 <br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
+# 私有消息
 
 ## 订单私有消息
 ```json
 {
    "type": "message",
-   "topic": "/contractMarket/tradeOrders",
+   "topic": "/futuresTrade/orders",
    "subject": "orderChange",
    "channelType": "private",
    "data": {
        "orderId": "5cdfc138b21023a909e5ad55", //订单号
-       "symbol": "XBTUSDM",  //合约symbol
-       "type": "match",  //消息类型，取值列表: "open", "match", "filled", "canceled", "update" 
-       "status": "open", //订单状态: "match", "open", "done"
-       "matchSize": "", //成交数量 (当类型为"match"时包含此字段) 
-       "matchPrice": "",//成交价格 (当类型为"match"时包含此字段) 
-       "orderType": "limit", //订单类型, "market"表示市价单", "limit"表示限价单 
-       "side": "buy",  // 订单方向，买或卖 
-       "price": "3600",  //订单价格
-       "size": "20000",  //订单数量
-       "remainSize": "20001",  //订单剩余可用于交易的数量
-       "filledSize":"20000",  //订单已成交的数量
-       "canceledSize": "0",  //  update消息中，订单减少的数量
-       "tradeId": "5ce24c16b210233c36eexxxx",  //交易号(当类型为"match"时包含此字段) 
-       "clientOid": "5ce24c16b210233c36ee321d", //用户自定义ID 
-       "orderTime": 1545914149935808589,  // 下单时间 
-       "oldSize ": "15000", // 更新前的数量(当类型为"update"时包含此字段) 
-       "liquidity": "maker", // 成交方向，取taker一方的买卖方向 
-       "ts": 1545914149935808589 // 时间戳
+      "tradeId": "123", // 撮合交易id
+      "symbol": "BTCUSDTM", //合约symbol
+      "eventType": "match", //消息类型，取值列表: "open", "match", "filled", "canceled", "update","adl","liquidation"
+      "status": "MATCHING", //订单状态: "MATCHING", "FINISH"
+      "matchSize": "", //成交数量 (当类型为"match"时包含此字段)
+      "matchPrice": "",//成交价格 (当类型为"match"时包含此字段)
+      "orderType": "LIMIT", //订单类型, "MARKET"表示市价单, "LIMIT"表示限价单
+      "side": "BUY", // 订单方向，买或卖
+      "price": "3600", //订单价格
+      "size": "20000", //订单数量
+      "remainSize": "20001", //订单剩余可用于交易的数量
+      "filledSize":"20000", //订单已成交的数量
+      "canceledSize": "0", // canceled消息中，订单减少的数量
+      "clientOid": "5ce24c16b210233c36ee321d", //用户自定义ID
+      "orderTime": , // 下单时间 ms
+      "liquidity": "maker", // 成交方向，取taker一方的买卖方向
+      "ts": // 时间戳 ms,
+      "sn": //序列号 sn
    }
 }
 ```
 **订单状态** 
-   "match": 订单为taker时与买卖盘中订单成交，此时该taker订单状态为match；
-   "open": 订单存在于买卖盘中；  
-   "done": 订单完成；
+   "MATCHING": 撮合中，表示订单挂在盘口上
+   "FINISH": 订单完成；
 
 **消息类型**
    "open": 订单进入买卖盘时发出的消息；  
    "match": 订单成交时发出的消息；
    "filled": 订单因成交后状态变为DONE时发出的消息；
    "canceled": 订单因被取消后状态变为DONE时发出的消息；
-   "update": 订单因被修改发出的消息；
+   "adl": adl订单；
+   "liquidation": 强平订单；
 <br/>
 <br/>
 <br/>
@@ -3024,30 +2679,27 @@ topic:  **/contract/announcement**
 <br/>
 <br/>
 <br/>
-
 
 ## 止损单生命周期监听事件
 
 ```json
   {
-       "userId": "5cd3f1a7b7ebc19ae9558591", // 不推荐使用, 后续版本将删除
-       "topic": "/contractMarket/advancedOrders", 
+       "topic": "/futuresTrade/stopOrder", 
        "subject": "stopOrder",
        "data": {
-           "orderId": "5cdfc138b21023a909e5ad55", //订单编号
-           "symbol": "XBTUSDM",  //合约symbol
-           "type": "open",  // 消息类型: open (止损下单成功), triggered (止损单触发), cancel (止损单取消)
-           "orderType":"stop", // 订单类型: stop
-           "side":"buy", // 订单买卖方向
-           "size":"1000", //数量 
-           "orderPrice":"9000",  //订单价格
-           "stop":"up", //止损类型 ("up" 或 "down")
-           "stopPrice":"9100", //止损单触发价格
-           "stopPriceType":"TP", //止损单触发价格类型
-           "triggerSuccess": true, //触发成功标记, 只有triggered类型消息需要
-           "error": "error.createOrder.accountBalanceInsufficient", //错误码, 触发失败时使用
-           "createdAt": 1558074652423  //创建时间
-           "ts":1558074652423004000  //创建时间戳纳秒
+          "orderId": "5cdfc138b21023a909e5ad55", //订单编号
+          "symbol": "BTCUSDTM", //合约symbol
+          "eventType": "open", // 消息类型: open (止损下单成功), triggered (止损单触发), canceled (止损单取消)
+          "orderType":"STOP", // 订单类型: STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET
+          "side":"BUY", // 订单买卖方向
+          "size":"1000", //数量
+          "orderPrice":"9000", //订单价格
+          "stopPrice":"9100", //止损单触发价格
+          "workingType":"TP", //止损单触发价格类型
+          "triggerSuccess": true, //触发成功标记, 只有triggered类型消息需要
+          "error": "error.createOrder.accountBalanceInsufficient", //错误码, 触发失败时使用
+          "createdAt": 1558074652423, //创建时间
+          "ts":1233123123 //消息时间 ms
        }
   }
 ```
@@ -3075,22 +2727,33 @@ topic:  **/contract/announcement**
 <br/>
 <br/>
 
-## 账户资金发生变化
-### 委托保证金变更事件
+## 可用余额变更事件
 
 ```json
-  //委托保证金变更事件
-  { 
-    "userId": "xbc453tg732eba53a88ggyt8c", // 不推荐使用, 后续版本将删除
-    "topic": "/contractAccount/wallet",
-    "subject": "orderMargin.change",
-    "data": {
-        "orderMargin": 5923,//当前委托保证金
-        "currency":"USDT",//币种
-        "timestamp": 1553842862614
-    }
-  }
+{
+    "type":"message",
+    "topic":"/futuresAccount/accountChange",
+    "channelType":"private",
+    "subject":"futures.availableBalance.change",
+    "data":{
+        "accountEquity": "999922.7850290000",
+        "availableBalance": "814058.3002530800",
+        "availableTransferBalance": "814058.3002530800",
+        "event":"ORDER_MARGIN_CHANGE_EVENT",
+        "currency": "USDT",
+        "holdBalance": "0.0000000000",
+        "orderMargin": "185863.9384800000",
+        "positionMargin": "0.5594959200",
+        "walletBalance": "999922.7982290000",
+        "sn": 11004,
+        "ts":1650426007488
+   }
+}
 ```
+**event**
+"ORDER_MARGIN_CHANGE_EVENT":订单保证金变更事件
+"POSITION_CHANGE_EVENT":仓位变更事件
+"TRANSFER_EVENT":"划转事件"
 
 <br/>
 <br/>
@@ -3105,266 +2768,49 @@ topic:  **/contract/announcement**
 <br/>
 <br/>
 
-### 可用余额变更事件
-
-```json
-   //可用余额变更事件
-  {
-    "userId": "xbc453tg732eba53a88ggyt8c", // 不推荐使用, 后续版本将删除
-    "topic": "/contractAccount/wallet",
-    "subject": "availableBalance.change",
-    "data": {
-      "availableBalance": 5923, //当前可用余额
-      "holdBalance": 2312, //冻结金额
-      "currency":"USDT",//币种
-      "timestamp": 1553842862614
-    }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 提现转出冻结变更事件
-
-```json
-   //提现转出冻结变更事件
-  {
-    "userId": "xbc453tg732eba53a88ggyt8c",  // 不推荐使用, 后续版本将删除
-    "topic": "/contractAccount/wallet",
-    "subject": "withdrawHold.change",
-    "data": {
-      "withdrawHold": 5923, //当前提现冻结
-      "currency":"USDT",//币种
-      "timestamp": 1553842862614
-    }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 
 ## 仓位变化
 ### 仓位操作引起的仓位变化
 
 ```json
-  //仓位操作引起的仓位变化
-  { 
-    "type": "message",
-    "userId": "5c32d69203aa676ce4b543c7",  // 不推荐使用, 后续版本将删除
-    "channelType": "private",
-    "topic": "/contract/position:XBTUSDM", 	
-    "subject": "position.change", 
-      "data": {
-      "realisedGrossPnl": 0E-8,                //累加已实现毛利
-      "symbol":"XBTUSDM",                      //有效合约代码
-      "crossMode": false,                      //是否全仓
-      "liquidationPrice": 1000000.0,           //强平价格
-      "posLoss": 0E-8,                         //手动追加的保证金
-      "avgEntryPrice": 7508.22,                //平均开仓价格
-      "unrealisedPnl": -0.00014735,            //未实现盈亏
-      "markPrice": 7947.83,                    //标记价格
-      "posMargin": 0.00266779,                 //仓位保证金
-      "autoDeposit": false,                    //是否自动追加保证金
-      "riskLimit": 100000,                     //风险限额
-      "unrealisedCost": 0.00266375,            //未实现价值
-      "posComm": 0.00000392,                   //破产费用
-      "posMaint": 0.00001724,                  //维持保证金
-      "posCost": 0.00266375,                   //仓位价值
-      "maintMarginReq": 0.005,                 //维持保证金比例
-      "bankruptPrice": 1000000.0,              //破产价格
-      "realisedCost": 0.00000271,              //当前累计已实现仓位价值
-      "markValue": 0.00251640,                 //标记价值
-      "posInit": 0.00266375,                   //杠杆保证金
-      "realisedPnl": -0.00000253,              //已实现盈亏
-      "maintMargin": 0.00252044,               //仓位保证金
-      "realLeverage": 1.06,                    //杠杆倍数
-      "changeReason": "positionChange",        //变化原因:marginChange、positionChange、liquidation、autoAppendMarginStatusChange、adl
-      "currentCost": 0.00266375,               //当前总仓位价值
-      "openingTimestamp": 1558433191000,       //开仓时间
-      "currentQty": -20,                       //当前仓位
-      "delevPercentage": 0.52,                 //ADL分位数
-      "currentComm": 0.00000271,               //当前总费用
-      "realisedGrossCost": 0E-8,               //累计已实现毛利价值
-      "isOpen": true,                          //是否开仓
-      "posCross": 1.2E-7,                      //手动追加的保证金
-      "currentTimestamp": 1558506060394,       //当前时间戳
-      "unrealisedRoePcnt": -0.0553,            //投资回报率
-      "unrealisedPnlPcnt": -0.0553,            //仓位盈亏率
-      "settleCurrency": "XBT"                  //结算币种
-      }
-  }
-```
-**changeReason**
-“marginChange”: 仓位保证金变化;
-“positionChange”: 仓位变化;
-“liquidation”: 强平;
-“autoAppendMarginStatusChange”: 修改是否自动追加保证金;
-“adl”: 自动减仓;
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-### 标记价格变化引起的仓位变化
-
-```json
- //标记价格变化引起的仓位变化
-  { 
-    "userId": "5cd3f1a7b7ebc19ae9558591",  // 不推荐使用, 后续版本将删除
-    "topic": "/contract/position:XBTUSDM", 	
-    "subject": "position.change", 
-      "data": {
-          "markPrice": 7947.83,                   //标记价格
-          "markValue": 0.00251640,                 //标记价值
-          "maintMargin": 0.00252044,              //仓位保证金
-          "realLeverage": 10.06,                   //杠杆倍数
-          "unrealisedPnl": -0.00014735,           //未实现盈亏
-          "unrealisedRoePcnt": -0.0553,           //投资回报率
-          "unrealisedPnlPcnt": -0.0553,            //仓位盈亏率
-          "delevPercentage": 0.52,             //ADL分位数
-          "currentTimestamp": 1558087175068,       //当前时间戳
-          "settleCurrency": "XBT"                  //结算币种
-      }
-  }
-```
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-
-### 资金费用结算
-
-```json
- //资金费用结算
-  { 
-    "userId": "xbc453tg732eba53a88ggyt8c",  // 不推荐使用, 后续版本将删除
-    "topic": "/contract/position:XBTUSDM",
-    "subject": "position.settlement",
-    "data": {
-        "fundingTime": 1551770400000,          //费用时间
-        "qty": 100,                            //仓位数
-        "markPrice": 3610.85,                 //结算价格，为8时刻标记价格，四舍五入到最近合法价格
-        "fundingRate": -0.002966,             //结算资金费率
-        "fundingFee": -296,                   //资金费用
-        "ts": 1547697294838004923,             //当前时间(纳秒)
-        "settleCurrency": "XBT"                //结算币种
+  {
+    "type":"message",
+    "topic":"/futuresPosition/position",
+    "channelType":"private",
+    "subject":"position.change",
+    "sn":45300,
+    "data":{
+        "autoDeposit":false,
+        "changeType":"POSITION_CHANGE",
+        "entryPrice":14.431,
+        "entryValue":-17.3178,
+        "leverage":5,
+        "liquidationPrice":17.161,
+        "liquidationValue":-20.59413818,
+        "maintenanceMargin":0.173178,
+        "maintenanceMarginRate":0.01,
+        "margin":3.44951618,
+        "marginType":"ISOLATED",
+        "markPrice":14.15,
+        "openTime":1650424933902,
+        "qty":-12,
+        "riskRate":0.0458,
+        "settleCurrency":"USDT",
+        "side":"BOTH",
+        "snapshotId":6558,
+        "symbol":"LINKUSDTM",
+        "totalMargin":3.78731618,
+        "unrealisedPnl":0.3378,
+        "sn":12323,
+        "ts":1650424935025
     }
-  }
+}
 ```
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+**changeType**
+MARGIN_CHANGE（增减保证金仓位变更）,POSITION_CHANGE（用户成交引起的仓位数量变更）,LIQUIDATION（强平仓位变更）,ADL（自动减仓仓位变更）,LEVERAGE_CHANGE（全局杠杆仓位变更),
+FUNDING_SETTLE（资金费用结算仓位变更）,AUTO_DEPOSIT（自动追加保证金状态仓位变更）,SETTLEMENT（交割仓位变更）
 
-### 风险限额调整结果
-
-```json 
-// Adjustment Result of Risk Limit Level
-{ 
-  "userId": "xbc453tg732eba53a88ggyt8c", 
-  "topic": "/contract/position:ADAUSDTM", 
-  "subject": "position.adjustRiskLimit", 
-  "data": { 
-    "success": true, // 是否成功 
-    "riskLimitLevel": 1, // 当前风险限额等级
-    "msg": "" // 失败原因 
-  }
-} 
-``` 
-失败原因有两种情况：1.持仓价值大于风险限额等级额度; 2.余额不足，保证金追加失败。
-
+<br/>
 <br/>
 <br/>
 <br/>
