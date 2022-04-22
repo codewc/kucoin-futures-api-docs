@@ -2423,6 +2423,7 @@ Topic：**/futuresMarket/level2:{symbol}**
 Topic: **/futuresMarket/execution:{symbol}**
 
 每撮合一笔订单，系统就会按照如下格式向您推送消息：
+
 ```json
  {
    "topic": "/futuresMarket/execution:XBTUSDM",
@@ -2553,6 +2554,9 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 
 ## 标记价格、指数价格
+
+Topic: **/futuresContract/markPrice**
+
 ```json
   //标记价格、指数价格
 {
@@ -2580,6 +2584,9 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 
 ## 资金费率
+
+Topic: **/futuresContract/fundingRate:{symbol}**
+
 ```json
  //资金费率
 {
@@ -2610,6 +2617,9 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 # 私有消息
 
 ## 订单私有消息
+
+Topic: **/futuresTrade/orders**
+
 ```json
 {
    "type": "message",
@@ -2682,6 +2692,8 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 ## 止损单生命周期监听事件
 
+Topic: **/futuresTrade/stopOrder**
+
 ```json
   {
        "topic": "/futuresTrade/stopOrder", 
@@ -2729,6 +2741,8 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 ## 可用余额变更事件
 
+Topic: **/futuresAccount/accountChange**
+
 ```json
 {
     "type":"message",
@@ -2771,6 +2785,8 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 ## 仓位变化
 ### 仓位操作引起的仓位变化
+
+Topic: **/futuresPosition/position**
 
 ```json
   {
