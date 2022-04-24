@@ -655,6 +655,100 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
 服务器请求的时间戳与API服务器时差必须控制在**5秒**以内，否则请求会因过期而被服务器拒绝。如果服务器与API服务器之间存在时间偏差，请使用平台提供的服务器时间接口，获取API服务器的时间。
 
 
+## 枚举定义
+
+* 买卖方向(`side`):
+    - `BUY` 买/做多
+    - `SELL` 卖/做空
+</br></br>
+* 订单类型(`orderType`, `type`):
+    - `LIMIT` 限价单
+    - `MARKET` 市价单
+    - `STOP` 限价止损
+    - `TAKE_PROFIT` 限价止盈
+    - `STOP_MARKET` 市价止损
+    - `TAKE_PROFIT_MARKET`  市价止盈
+    - **TRAILING_STOP_MARKET ?**TODO:
+</br></br>
+* 下单类型(`placeType`):
+    - **DEFAULT	？**TODO
+    - **OTOCO	？**TODO
+    - `STEP_REDUCE_POSITION`	阶梯减仓
+    - `LIQUIDATION_TAKE_OVER`	强平接管
+    - `ADL_TRIGGER`	ADL触发用户
+    - `ADL_LUCKY`	ADL幸运用户
+</br></br>
+* 触发价格方式(workingType):
+    - `MP`	标记价格
+    - `TP`	最新成交价
+</br></br>
+* 有效方式(timeInForce):
+    - `GTC`: 用户主动取消才过期
+    - `IOC`:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘；
+    - `FOK`：如果下单不能全部成交，则取消；
+</br></br>
+* 资金记录类型(`type`):
+    - `CONSUME`-消费,
+    - `FUNDING`-资金费用,
+    - `FEE`-手续费,
+    - `REALIZED_PNL`-已实现盈亏,
+    - `TRANSFER_IN`-转入,
+    - `TRANSFER_OUT`-转出,
+    - `SON_MOTHER_ACCOUNT_TRANSFER`-合约子母账号划转,
+    - `TRIAL_RECYCLE`-体验金回收,
+    - `REWARD`-发奖,
+    - `DEDUCTION_REFUND`-抵扣返还;
+</br></br>
+* 付款账户类型(`payAccountType`):
+    - `MAIN`-储蓄账户
+    - `TRADE`-交易账户
+</br></br>
+* 接收账户类型(`recAccountType`):
+    - `MAIN`-储蓄账户
+    - `TRADE`-币币账户
+</br></br>
+* 划转状态(`status`):
+    - `APPLY`-待处理
+    - `PROCESSING`-处理中
+    - `PENDING_APPROVAL`-待审核
+    - `APPROVED`-审核通过
+    - `REJECTED`-审核拒绝
+    - `PENDING_CANCEL`-待退款
+    - `CANCEL`-取消
+    - `SUCCESS`-成功
+</br></br>
+* 转出状态(`status`):
+    - `PROCESSING`-处理中
+    - `SUCCESS`-成功
+    - `FAILURE`-失败
+</br></br>
+保证金模式(`marginType`):
+    - `ISOLATED`-逐仓
+    - `CROSSED`-全仓
+</br></br>
+仓位方向(`side`):
+    - `BOTH`-单向持仓
+    - `LONG`-做多方向
+    - `SHORT`-做空方向
+</br></br>
+平仓类型(`type`):
+    - `CLOSE_LONG`-手动平多
+    - `CLOSE_SHORT`-手动平多
+    - `LIQUID_LONG`-强制平多
+    - `LIQUID_SHORT`-强制平空
+    - `ADL_LONG`-adl平多
+    - `ADL_SHORT`-adl平空
+</br></br>
+* 合约类型(`type`):
+    - `FFWCSX`-永续
+    - `FFICSX`-交割
+</br></br>
+* 合约状态(`status`):
+  - `Open`-已上线
+  - `PrepareSettled`-准备结算
+  - `BeingSettled`-结算中
+  - `Paused`-已暂停
+  - `CancelOnly`只能撤单
 
 ---
 # 用户
@@ -675,8 +769,7 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
 symbol | String | 是 | 合约symbol
-autoDeposit | Boolean | 是 | 是否开启自动追加保证金（开启时，达到强平价格时会尝试自动追加保证金）
-
+autoDeposit | Boolean | 是 | 是否开启自动追加保证金（设置为`true`时，达到强平价格时会尝试自动追加保证金）
 ## 获取用户全局杠杆
 ```json
 {
@@ -761,39 +854,60 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 
 ## 获取账户概览
 ```json
-//TODO
 {
-  "code": "string",
-  "data": [
-    {
-      "accountEquity": 0,
-      "availableBalance": 0,
-      "availableTransferBalance": 0,
-      "currency": "string",
-      "holdBalance": 0,
-      "orderMargin": 0,
-      "positionMargin": 0,
-      "unrealisedPNL": 0,
-      "walletBalance": 0
-    }
-  ],
-  "msg": "string",
-  "retry": true,
-  "success": true
-} 
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": [
+        {
+            "currency": "USDT", //币种
+            "walletBalance": "21098384.5602084900", //钱包余额
+            "positionMargin": "310.7995729500", //仓位保证金
+            "orderMargin": "7177.2558034300", //订单保证金
+            "availableBalance": "21090896.5048321100", //可用余额
+            "unrealisedPNL": "2.2572000000", //仓位未实现盈亏
+            "accountEquity": "21098386.8174084900", //该币种账户总权益 = 钱包余额 + 仓位未实现盈亏
+            "holdBalance": "0.0000000000", //划转冻结金额
+            "availableTransferBalance": "21090896.5048321100" //可转出金额
+        },
+        {
+            "currency": "ETH",
+            "walletBalance": "100.0000000000",
+            "positionMargin": "0.0000000000",
+            "orderMargin": "0.0000000000",
+            "availableBalance": "100.0000000000",
+            "unrealisedPNL": "0",
+            "accountEquity": "100.0000000000",
+            "holdBalance": "0.0000000000",
+            "availableTransferBalance": "100.0000000000"
+        },
+        {
+            "currency": "XRP",
+            "walletBalance": "10000.0000000000",
+            "positionMargin": "0.0000000000",
+            "orderMargin": "0.0000000000",
+            "availableBalance": "10000.0000000000",
+            "unrealisedPNL": "0",
+            "accountEquity": "10000.0000000000",
+            "holdBalance": "0.0000000000",
+            "availableTransferBalance": "10000.0000000000"
+        }
+    ]
+}
 ```
 ### HTTP请求
 `GET /api/v2/account-overview`
 ### 请求示例
 GET /api/v2/account-overview?currency=BTC
 ### API权限
-该接口需要通用权限
+该接口需要`通用权限`
 ### 频率限制
-此接口针对每个账号请求频率限制为30次/3s
+此接口针对每个账号请求频率限制为`30次/3s`
 ### 参数  
-参数|数据类型|含义
----|---|---
-currency|String|[可选]币种 BTC、USDT、ETH、XRP、DOT,不传则查询所有币种
+参数|数据类型|是否必需|含义
+---|---|---|---
+currency|String|NO|币种 BTC、USDT、ETH、XRP、DOT,不传则查询所有币种
 ### 返回值  
 字段|含义
 ---|---
@@ -803,29 +917,44 @@ positionMargin|仓位保证金
 orderMargin|订单保证金
 availableBalance|可用余额
 unrealisedPNL|未实现盈亏
-accountEquity|合约账户总权益
+accountEquity|合约账户总权益。`合约账户总权益` = `钱包余额` + `未实现盈亏`
 holdBalance|转出冻结
 availableTransferBalance|可转金额
 
 
 ## 查询资金记录
 ```json
-// TODO
 {
-  "code": "string",
-  "data": [
-    {
-      "amount": "string",
-      "currency": "string",
-      "remark": "string",
-      "time": 0,
-      "type": "string",
-      "walletBalance": "string"
-    }
-  ],
-  "msg": "string",
-  "retry": true,
-  "success": true
+    "success": true,
+    "code": "200", //200代表成功，其他代表失败
+    "msg": "success",
+    "retry": false,
+    "data": [
+        {
+            "time": 1650348854000, //业务发生时间
+            "currency": "USDT", //币种
+            "type": "FEE", //业务类型
+            "amount": "-0.00408000", //交易金额
+            "walletBalance": "99999.70744444", //钱包余额
+            "remark": "ETHUSDTM" //交易说明
+        },
+        {
+            "time": 1650348854000,
+            "currency": "USDT",
+            "type": "REALIZED_PNL",
+            "amount": "0.00408000",
+            "walletBalance": "0.55080000",
+            "remark": "ETHUSDTM"
+        },
+        {
+            "time": 1650538206000,
+            "currency": "USDT",
+            "type": "FEE",
+            "amount": "-0.54400000",
+            "walletBalance": "100000.54400000",
+            "remark": "ETHUSDTM"
+        }
+    ]
 }
 ```
 ### HTTP请求
@@ -833,30 +962,36 @@ availableTransferBalance|可转金额
 ### 请求示例
 GET /api/v2/transaction-history?currency=USDT
 #### API权限
-该接口需要通用权限
+该接口需要`通用权限`
 #### 频率限制
-此接口针对每个账号请求频率限制为30次/3s
+此接口针对每个账号请求频率限制为`30次/3s`
 ### 参数  
-参数|数据类型|含义
----|---|---
-limit|Integer|记录数，默认100，最大1000
-currency|String|[可选]币种
-type|String|[可选]流水类型
-startAt|Long|[可选]开始时间
-endAt|Long|[可选]结束时间  
+参数|数据类型|是否必需|含义
+---|---|---|---
+limit|Integer|NO|记录数，默认`100`，最大`1000`
+currency|String|NO|币种
+type|String|NO|流水类型
+startAt|Long|NO|开始时间
+endAt|Long|NO|结束时间  
 
-* type说明：
-    * CONSUME-消费,
-    * FUNDING-资金费用,
-    * FEE-手续费,
-    * REALIZED_PNL-已实现盈亏,
-    * TRANSFER_IN-转入,
-    * TRANSFER_OUT-转出,
-    * SON_MOTHER_ACCOUNT_TRANSFER-合约子母账号划转,
-    * TRIAL_RECYCLE-体验金回收,
-    * REWARD-发奖,  
-    * DEDUCTION_REFUND-抵扣返还,
-    * INSURANCE_CROSS_POSITION_PAY-保险基金穿仓支付;
+<aside class="notice">
+如果未传<code>startAt</code>,默认返回最近7天数据。
+</aside>
+
+* 流水类型(`type`)说明：
+    * `CONSUME`-消费,
+    * `FUNDING`-资金费用,
+    * `FEE`-手续费,
+    * `REALIZED_PNL`-已实现盈亏,
+    * `TRANSFER_IN`-转入,
+    * `TRANSFER_OUT`-转出,
+    * `SON_MOTHER_ACCOUNT_TRANSFER`-合约子母账号划转,
+    * `TRIAL_RECYCLE`-体验金回收,
+    * `REWARD`-发奖,  
+    * `DEDUCTION_REFUND`-抵扣返还,
+    * `INSURANCE_CROSS_POSITION_PAY`-保险基金穿仓支付;
+
+
 
 ### 返回值  
 字段|含义
@@ -873,31 +1008,30 @@ remark|说明
 # 划转
 ## 转出到KuCoin储蓄/币币账户
 ``` json
-//TODO
 {
-  "code": "string",
-  "data": {
-    "amount": 0,
-    "applyId": "string",
-    "bizNo": "string",
-    "createdAt": "2022-04-11T05:11:05.591Z",
-    "currency": "string",
-    "fee": 0,
-    "payAccountType": "string",
-    "payTag": "string",
-    "reason": "string",
-    "recAccountType": "string",
-    "recRemark": "string",
-    "recSystem": "KUCOIN",
-    "recTag": "string",
-    "remark": "string",
-    "sn": 0,
-    "status": "string",
-    "updatedAt": "2022-04-11T05:11:05.591Z"
-  },
-  "msg": "string",
-  "retry": true,
-  "success": true
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "applyId": "30626177500585984", //转出申请id，可以使用该id撤回申请
+        "bizNo": "30626172928794624", //业务唯一编码
+        "payAccountType": "CONTRACT", //付款账户类型
+        "payTag": "DEFAULT", //付款账户子类型
+        "remark": "", //用户备注
+        "recAccountType": "MAIN", //收款账户类型
+        "recTag": "DEFAULT", //收款账户子类型
+        "recRemark": "", //收款账户流水备注
+        "recSystem": "KUCOIN", //收款服务方
+        "status": "APPLY", //状态
+        "currency": "USDT", //币种
+        "amount": "22.0000000000", //划转金额
+        "fee": "0.0000000000", //划转手续费
+        "sn": 30626177504780288, //唯一序列号
+        "reason": "", //失败原因
+        "createdAt": 1650773821000, //创建时间
+        "updatedAt": 1650773822000 //更新时间
+    }
 }
 ```
 ### HTTP请求
@@ -905,19 +1039,19 @@ remark|说明
 ### 请求示例
 POST /api/v2/transfer-out
 ### API权限
-该接口需要通用权限
+该接口需要`交易权限`
 ### 频率限制
-此接口针对每个账号请求频率限制为30次/3s 
+此接口针对每个账号请求频率限制为`30次/3s `
 ### 参数  
-参数|数据类型|含义
----|---|---
-amount|Number|划转金额
-currency|String|币种
-recAccountType|String|接收账户类型，只能是`MAIN`-储蓄账户、`TRADE`-币币账户
+参数|数据类型|是否必需|含义
+---|---|---|---
+amount|Number|YES|划转金额
+currency|String|YES|币种，如USDT、BTC
+recAccountType|String|YES|接收账户类型，只能是`MAIN`-储蓄账户、`TRADE`-币币账户
 ### 返回值  
 字段|含义
 ---|---
-applyId|转出申请Id
+applyId|转出申请id，可以使用该id撤回申请
 bizNo|业务主键id
 payAccountType|付款账户类型
 payTag|付款账户子类型
@@ -926,7 +1060,7 @@ recAccountType|收款账户类型
 recTag|收款账户子类型
 recRemark|收款账户流水备注
 recSystem|收款服务方
-status|状态APPLY-待处理,PROCESSING-处理中,PENDING_APPROVAL-待审核,APPROVED-审核通过,REJECTED-审核拒绝,PENDING_CANCEL-待退款,CANCEL-取消,SUCCESS-成功
+status|状态:`APPLY`-待处理,`PROCESSING`-处理中,`PENDING_APPROVAL`-待审核,`APPROVED`-审核通过,`REJECTED`-审核拒绝,`PENDING_CANCEL`-待退款,`CANCEL`-取消,`SUCCESS`-成功
 currency|币种
 amount|划转金额
 fee|划转手续费
@@ -939,26 +1073,37 @@ updatedAt|更新时间
 
 ## 查询转出申请记录
 ``` json
-//TODO
 {
-  "code": "string",
-  "data": [
-    {
-      "amount": 0,
-      "applyId": "string",
-      "createdAt": 0,
-      "currency": "string",
-      "reason": "string",
-      "recRemark": "string",
-      "recSystem": "KUCOIN",
-      "remark": "string",
-      "sn": 0,
-      "status": "string"
-    }
-  ],
-  "msg": "string",
-  "retry": true,
-  "success": true
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": [
+        {
+            "applyId": "30626177500585984", //申请id
+            "currency": "USDT", //币种
+            "recRemark": "", //收款账户流水备注
+            "recSystem": "KUCOIN", //收款服务方
+            "status": "PROCESSING", //状态
+            "amount": "22.0000000000", //划转金额
+            "reason": "", //失败原因
+            "sn": 30626177504780288, //唯一序列号
+            "createdAt": 1650773821000, //业务发生时间
+            "remark": "" //用户备注
+        },
+        {
+            "applyId": "8djl4jt07pc",
+            "currency": "USDT",
+            "recRemark": "",
+            "recSystem": "KUCOIN",
+            "status": "PROCESSING",
+            "amount": "22.0000000000",
+            "reason": "",
+            "sn": 30624803597586433,
+            "createdAt": 1650773493000,
+            "remark": ""
+        }
+    ]
 }
 ```
 ### HTTP请求
@@ -966,18 +1111,23 @@ updatedAt|更新时间
 ### 请求示例
 GET /api/v2/transfer-list
 ### API权限
-该接口需要通用权限
+该接口需要`通用权限`
 ### 频率限制
-此接口针对每个账号请求频率限制为30次/3s
+此接口针对每个账号请求频率限制为`30次/3s`
 ### 参数  
-参数|数据类型|含义
----|---|---
-startAt|Long|业务发生起始时间
-endAt|Long|业务发生截止时间
-limit|Integer|记录数，默认100，最大1000
-currency|String|币种
-status|String|状态：`PROCESSING`-处理中，`SUCCESS`-成功, `FAILURE`-失败
-### 返回值  
+参数|数据类型|是否必需|含义
+---|---|---|---
+startAt|Long|NO|业务发生起始时间
+endAt|Long|NO|业务发生截止时间
+limit|Integer|NO|记录数，默认`100`，最大`1000`
+currency|String|NO|币种
+status|String|NO|状态，`PROCESSING`-处理中，`SUCCESS`-成功, `FAILURE`-失败
+
+<aside class="notice">
+如果不传<code>startAt</code>和<code>endAt</code>,默认返回最近7天数据。
+</aside>
+
+### 返回值
 字段|含义
 ---|---
 applyId|转出申请Id
@@ -994,12 +1144,12 @@ remark|付款账户备注
 
 ## 取消转出
 ```json
-//TODO
 {
-  "code": "string",
-  "msg": "string",
-  "retry": true,
-  "success": true
+    "success": true,
+    "code": "200", //200代表成功，其他代表失败
+    "msg": "success",
+    "retry": false,
+    "data": null
 }
 ```
 ### HTTP请求
@@ -1007,23 +1157,22 @@ remark|付款账户备注
 ### 请求示例
 DELETE /api/v2/cancel/transfer-out
 ### API权限
-该接口需要通用权限
+该接口需要`通用权限`
 ### 频率限制
-此接口针对每个账号请求频率限制为30次/3s 
+此接口针对每个账号请求频率限制为`30次/3s`
 ### 参数  
-参数|数据类型|含义
----|---|---
-applyId|String|转出申请id
+参数|数据类型|是否必需|含义
+---|---|---|---
+applyId|String|YES|转出申请id
 
 
 ## 资金转入合约账户
 ``` json
-//TODO
 {
-  "code": "string",
-  "msg": "string",
-  "retry": true,
-  "success": true
+    "code": "200", //code为200代表转入成功，否则代表失败
+    "msg": "",
+    "retry": true,
+    "success": true
 }
 ```
 ### HTTP请求
@@ -1031,16 +1180,15 @@ applyId|String|转出申请id
 ### 请求示例
 POST /api/v2/transfer-in
 ### API权限
-该接口需要交易权限
+该接口需要`交易权限`
 ### 频率限制
-此接口针对每个账号请求频率限制为30次/3s
+此接口针对每个账号请求频率限制为`30次/3s`
 ### 参数  
-参数|数据类型|含义
----|---|---
-amount|Number|交易金额
-currency|String|币种
-payAccountType|String|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE`-交易账户
-
+参数|数据类型|是否必需|含义
+---|---|---|---
+amount|Number|YES|交易金额
+currency|String|YES|币种
+payAccountType|String|YES|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE`-交易账户
 
 
 
@@ -1083,8 +1231,10 @@ payAccountType|String|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE
  postOnly     | BOOLEAN  | NO       | [可选] 只挂单的标识。选择`postOnly`，不允许选择`hidden`。当订单时效为`IOC`策略时，该参数无效。 
  workingType  | STRING   | NO       | [可选] 止损单触发价类型，包括`TP`和`MP`                          
  timeInForce  | STRING   | NO       | 有效方法                                                     
+ clientTimestamp| TIMESTAMP | NO | [可选]客户端下单时间
+ allowMaxTimeWindow| INT | NO | [可选]允许服务器接收到请求时间与`clientTimestamp`最大时间间隔
 
-根据order **type** 的不同， 对应需要的参数如下：
+根据下单`type`的不同， 对应需要的参数如下：
 
 | Type                               | 参数                          |
 | ---------------------------------- | ---------------------------- |
@@ -1097,26 +1247,21 @@ payAccountType|String|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE
     * `STOP`, `STOP_MARKET` 止损单：
         * 买入: 最新合约价格/标记价格高于等于触发价`stopPrice`
         * 卖出: 最新合约价格/标记价格低于等于触发价`stopPrice`
-
     * `TAKE_PROFIT`, `TAKE_PROFIT_MARKET` 止盈单：
         * 买入: 最新合约价格/标记价格低于等于触发价`stopPrice`
         * 卖出: 最新合约价格/标记价格高于等于触发价`stopPrice`
+<br/><br/>
+* `clientTimestamp`和`allowMaxTimeWindow`参数说明：当这两个参数`同时`传递才会生效
+      * 验证逻辑：
+          * 1. 服务器接收到请求时间: `receiveTime`
+          * 2. 服务器接收到请求时间(`receiveTime`)与客户端下单时间(`clientTimestamp`)间隔:`receiveTime` - `clientTimestamp` = `timeWindow``
+          * 3. 当`clientTimestamp` <= `receiveTime`同时`timeWindow` <= `allowMaxTimeWindow`时，下单请求才会被接受,否则下单失败返回错误码`300019`
+<br/><br/>
 
 ### 返回值
 属性  | 含义 
 --------- | -----------
 orderId | 订单id 
-
-### 术语解释
-
-### 合约<code>symbol</code>
-合约必须是KuCoin Futures支持的合约，如XBTUSDM。
-
-### 用户订单ID<code>clientOid</code>
-
-ClientOid字段是客户端创建的唯一的ID（推荐使用UUID），只能包含数字、字母、下划线（_） 和 分隔线（-）。这个字段会在获取订单信息时返回。您可使用clientOid来标识您的订单。ClientOid不同于服务端创建的订单ID。请不要使用同一个clientOid发起请求。**clientOid最长不得超过40个字符**。
-
-请妥善记录服务端创建的orderId，以用于查询订单状态的更新。
 
 ## 单个撤单
 ```json
@@ -1207,13 +1352,13 @@ orderIds | 成功撤掉的订单id
 ### HTTP请求
 `GET /api/v2/orders/historical-trades`
 ### 参数
-| 参数     | 数据类型 | 含义 |
-| :------- | -------- | ------------ |
-| symbol | String | [必填] 合约symbol	|
-| startAt | Long  | [可选] 开始时间（毫秒）	|
-| endAt | Long | [可选] 截止时间（毫秒）	|
-| limit | Integer | 默认 50; 最大 1000.	|
-| fromId | Long | [可选] 从哪一条成交id开始返回. 缺省返回最近的成交记录	|
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| symbol | String | YES | 合约symbol	|
+| startAt | Long  | NO | 开始时间（毫秒）	|
+| endAt | Long | NO | 截止时间（毫秒）	|
+| limit | Integer | NO | 默认 `50`; 最大 `1000`.	|
+| fromId | Long | NO |从哪一条成交id开始返回. 缺省返回最近的成交记录	|
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1279,16 +1424,17 @@ orderIds | 成功撤掉的订单id
 ### HTTP请求
 `GET /api/v2/orders/active`
 ### 参数
-| 参数     | 数据类型 | 含义 |
-| :------- | -------- | -------------- |
-| symbol | String | [必须] 合约symbol	|
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| symbol | String | YES | 合约symbol	|
+
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
 | id | 订单ID |
 | symbol | 合约名称 |
 | type | 订单类型 |
-| side | 方向：BUY:买/做多 SELL:卖/做空 |
+| side | 方向：`BUY`:买/做多 `SELL`:卖/做空 |
 | price | 订单价格 |
 | size | 数量 |
 | dealSize | 订单成交数量 |
@@ -1305,7 +1451,7 @@ orderIds | 成功撤掉的订单id
 | orderTime | 下单时间 |
 | reduceOnly | 是否只减仓 |
 | status | 订单状态 |
-| placeType | 下单类型：DEFAULT、OTOCO、STEP_REDUCE_POSITION、LIQUIDATION_TAKE_OVER、ADL_TRIGGER、ADL_LUCKY |
+| placeType | 下单类型：`DEFAULT`、`OTOCO`、`STEP_REDUCE_POSITION`、`LIQUIDATION_TAKE_OVER`、`ADL_TRIGGER`、`ADL_LUCKY` |
 | takeProfitPrice| 订单止盈止损 止盈价格 |
 | cancelSize | 取消数量 |
 | clientOid	| 客户订单编号 |
@@ -1341,7 +1487,7 @@ orderIds | 成功撤掉的订单id
 | orderTime | 下单时间 |
 | reduceOnly | 是否只减仓 |
 | status | 订单状态 |
-| placeType | 下单类型：DEFAULT、OTOCO、STEP_REDUCE_POSITION、LIQUIDATION_TAKE_OVER、ADL_TRIGGER、ADL_LUCKY |
+| placeType | 下单类型：`DEFAULT`、`OTOCO`、`STEP_REDUCE_POSITION`、`LIQUIDATION_TAKE_OVER`、`ADL_TRIGGER`、`ADL_LUCKY` |
 | takeProfitPrice| 订单止盈止损 止盈价格 |
 | cancelSize | 取消数量 |
 | clientOid	| 客户订单编号 |
@@ -1395,21 +1541,21 @@ orderIds | 成功撤掉的订单id
 | startAt | Long  | 开始时间（毫秒）	|
 | endAt | Long  | 截止时间（毫秒）	|
 | fromId | Long | [可选] 从哪一条成交id开始返回.	|
-| limit | Integer | 默认 50; 最大 1000.	|
+| limit | Integer | 默认 `50`; 最大 `1000`.	|
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
 | id | 订单ID |
 | symbol | 合约名称 |
 | type | 订单类型 |
-| side | 方向：BUY:买/做多 SELL:卖/做空 |
+| side | 方向：`BUY`:买/做多 `SELL`:卖/做空 |
 | price | 订单价格 |
 | size | 数量 |
 | dealSize | 订单成交数量 |
 | dealValue | 成交价值 |
-| workingType | 触发价格方式：MP（标记价格）、TP（最新成交价） |
+| workingType | 触发价格方式：`MP`（标记价格）、`TP`（最新成交价） |
 | stopPrice | 触发价格，订单止盈止损 止损价格 |
-| timeInForce | GTC: 用户主动取消才过期, IOC:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； FOK：如果下单不能全部成交，则取消； |
+| timeInForce | `GTC`: 用户主动取消才过期, `IOC`:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； `FOK`：如果下单不能全部成交，则取消； |
 | postOnly | 是否只做maker |
 | hidden | 是否是隐藏单 |
 | leverage | 杠杆 |
@@ -1419,7 +1565,7 @@ orderIds | 成功撤掉的订单id
 | orderTime | 下单时间 |
 | reduceOnly | 是否只减仓 |
 | status | 订单状态 |
-| placeType | 下单类型：DEFAULT、OTOCO、STEP_REDUCE_POSITION、LIQUIDATION_TAKE_OVER、ADL_TRIGGER、ADL_LUCKY |
+| placeType | 下单类型：`DEFAULT`、`OTOCO`、`STEP_REDUCE_POSITION`、`LIQUIDATION_TAKE_OVER`、`ADL_TRIGGER`、`ADL_LUCKY` |
 | takeProfitPrice| 订单止盈止损 止盈价格 |
 | cancelSize | 取消数量 |
 | clientOid	| 客户订单编号 |
@@ -1897,8 +2043,8 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 | symbol   | String   | 合约symbol |
 | startAt | Long   | 开始时间 |
 | endAt | Long   | 结束时间 |
-| fromId | Long | [可选] 从哪一条成交id开始返回.	|
-| limit | Integer | 默认 50; 最大 1000.	|
+| fromId | Long | [可选] 从哪一条成交`id`开始返回.	|
+| limit | Integer | 默认 `50`; 最大 `1000`.	|
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1941,7 +2087,7 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 | 字段   | 类型   | 是否必需 | 说明                                |
 | ------ | ------ | -------- | ----------------------------------- |
 | symbol | 字符串 | Y        | 合约名称                            |
-| limit  | 数字   | N        | 买卖盘档数，默认500，取值范围1~1000 |
+| limit  | 数字   | N        | 买卖盘档数，默认`500`，取值范围`1`~`1000` |
 ### 返回值
 | 字段       | 含义     |
 | ---------- | -------- |
@@ -2040,10 +2186,10 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 ### HTTP请求
 `GET /api/v2/trades`
 ### 参数
-| 字段   | 类型   | 是否必需 | 说明                             |
-| ------ | ------ | -------- | -------------------------------- |
-| symbol | 字符串 | Y        | 合约名称                         |
-| limit  | 数字   | N        | 返回记录条数，默认20，范围1~1000 |
+| 字段   | 类型   | 是否必需 | 说明                                 |
+| ------ | ------ | -------- | --------------------------------- |
+| symbol | 字符串 | Y        | 合约名称                            |
+| limit  | 数字   | N        | 返回记录条数，默认`20`，范围`1`~`1000`|
 ### 返回值
 | 字段   | 含义                           |
 | ------ | ----------------------------- |
@@ -2304,7 +2450,7 @@ ID用于标识请求和ack的唯一字符串。
 您可通过privateChannel参数订阅以一些公共topic（如：`/contractMarket/tradeOrders`）。该参数默认设置为`false`。设置为`true`，您只能收到与您订阅相关的内容推送。
 
 #### Response
-若设置为`True`, 用户成功取消订阅后，系统将返回`ack`消息。
+若设置为`true`, 用户成功取消订阅后，系统将返回`ack`消息。
 
 ## 多路复用
  在一条物理连接上，您可开启多条多路复用通道，以订阅不同topic，获取多种数据推送。
@@ -2328,7 +2474,7 @@ ID用于标识请求和ack的唯一字符串。
 2. 最多可开启的多路复用通道条数：5条。
 
 ## 定序编号
-买卖盘数据化、成交历史数据以及快照消息均会默认返回sequence字段。您可以从Level 2和Level 3市场行情数据中的sequence来判断数据是否丢失，连接是否稳定。如果连接不稳定，请按照校准流程进行校准。
+买卖盘数据化、成交历史数据以及快照消息均会默认返回sequence字段。您可以从Level 2市场行情数据中的sequence来判断数据是否丢失，连接是否稳定。如果连接不稳定，请按照校准流程进行校准。
 
 ## 客户端消息判断逻辑
 
@@ -2711,8 +2857,7 @@ Topic: `/futuresTrade/orders`
     * `canceled`（订单因被取消后状态变为DONE时发出的消息）
     * `adl`（adl订单）
     * `liquidation`（强平订单）
-
-
+<br/><br/>
 * `status`订单状态说明：
     * `MATCHING`（撮合中，表示订单挂在盘口上）
     * `FINISH`（订单完成）
