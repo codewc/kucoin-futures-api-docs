@@ -236,8 +236,11 @@ USDT结算合约上线, 交易所从只支持一个币种 XBT, 变为同时支�
 
 ### REST API
 
-对需要校验API权限的私有接口，限制账号userid。不需要检验权限API，则限制IP。
-<aside class="notice">接口有特定请求频率限制说明，以特定说明为准。</aside>
+目前有以下3种限频规则：
+
+* `code: 1015`是指从该IP的请求过多，触发了cloudflare限制, 触发后限制时间`30s`。建议不同(子)账号使用不过的IP去请求，避免相互影响。
+* `{"code":"200002","msg":"Too many requests in a short period of time, please retry later"}`是指账号特定接口超过请求限制, 触发后限制时间为`10s`。您可以使用多个子账号来避免这个问题。
+* `{"code":"429000","msg":"Too Many Requests"}`是指服务器短时间收到过多请求，由于服务器过载保护拒绝了此次请求。您可以直接重试请求。
 
 ### WEBSOCKET
 
@@ -667,7 +670,7 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
 } 
 ```
 ### HTTP请求
-POST /api/v2/user-config/change-auto-deposit
+`POST /api/v2/user-config/change-auto-deposit`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -686,7 +689,7 @@ autoDeposit | Boolean | 是 | 是否开启自动追加保证金（开启时，�
 }
 ```
 ### HTTP请求
-GET /api/v2/user-config/leverage
+`GET /api/v2/user-config/leverage`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -701,23 +704,23 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 ## 获取用户全局杠杆(所有合约)
 ```json
 {
-"code": "200000",
-"data": [
-{
-"symbol": "ETHUSDTM",
-"leverage": "5",
-"maxRiskLimit": "10000000"
-},
-{
-"symbol": "BTCUSDTM",
-"leverage": "5",
-"maxRiskLimit": "20000000"
-}
-]
+  "code": "200000",
+  "data": [
+    {
+    "symbol": "ETHUSDTM",
+    "leverage": "5",
+    "maxRiskLimit": "10000000"
+    },
+    {
+    "symbol": "BTCUSDTM",
+    "leverage": "5",
+    "maxRiskLimit": "20000000"
+    }
+  ]
 }
 ```
 ### HTTP请求
-GET /api/v2/user-config/leverages
+`GET /api/v2/user-config/leverages`
 ### 参数
 无
 ### 返回值
@@ -739,7 +742,7 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 }
 ```
 ### HTTP请求
-POST /api/v2/user-config/adjust-leverage
+`POST /api/v2/user-config/adjust-leverage`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -780,7 +783,7 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 } 
 ```
 ### HTTP请求
-GET /api/v2/account-overview
+`GET /api/v2/account-overview`
 ### 请求示例
 GET /api/v2/account-overview?currency=BTC
 ### API权限
@@ -826,7 +829,7 @@ availableTransferBalance|可转金额
 }
 ```
 ### HTTP请求
-GET /api/v2/transaction-history
+`GET /api/v2/transaction-history`
 ### 请求示例
 GET /api/v2/transaction-history?currency=USDT
 #### API权限
@@ -842,17 +845,18 @@ type|String|[可选]流水类型
 startAt|Long|[可选]开始时间
 endAt|Long|[可选]结束时间  
 
-type说明：CONSUME-消费,
-    FUNDING-资金费用,
-    FEE-手续费,
-    REALIZED_PNL-已实现盈亏,
-    TRANSFER_IN-转入,
-    TRANSFER_OUT-转出,
-    SON_MOTHER_ACCOUNT_TRANSFER-合约子母账号划转,
-    TRIAL_RECYCLE-体验金回收,
-    REWARD-发奖,  
-    DEDUCTION_REFUND-抵扣返还,
-    INSURANCE_CROSS_POSITION_PAY-保险基金穿仓支付;
+* type说明：
+    * CONSUME-消费,
+    * FUNDING-资金费用,
+    * FEE-手续费,
+    * REALIZED_PNL-已实现盈亏,
+    * TRANSFER_IN-转入,
+    * TRANSFER_OUT-转出,
+    * SON_MOTHER_ACCOUNT_TRANSFER-合约子母账号划转,
+    * TRIAL_RECYCLE-体验金回收,
+    * REWARD-发奖,  
+    * DEDUCTION_REFUND-抵扣返还,
+    * INSURANCE_CROSS_POSITION_PAY-保险基金穿仓支付;
 
 ### 返回值  
 字段|含义
@@ -897,7 +901,7 @@ remark|说明
 }
 ```
 ### HTTP请求
-POST /api/v2/transfer-out
+`POST /api/v2/transfer-out`
 ### 请求示例
 POST /api/v2/transfer-out
 ### API权限
@@ -909,7 +913,7 @@ POST /api/v2/transfer-out
 ---|---|---
 amount|Number|划转金额
 currency|String|币种
-recAccountType|String|接收账户类型，只能是MAIN-储蓄账户、TRADE-币币账户
+recAccountType|String|接收账户类型，只能是`MAIN`-储蓄账户、`TRADE`-币币账户
 ### 返回值  
 字段|含义
 ---|---
@@ -958,7 +962,7 @@ updatedAt|更新时间
 }
 ```
 ### HTTP请求
-GET /api/v2/transfer-list
+`GET /api/v2/transfer-list`
 ### 请求示例
 GET /api/v2/transfer-list
 ### API权限
@@ -972,7 +976,7 @@ startAt|Long|业务发生起始时间
 endAt|Long|业务发生截止时间
 limit|Integer|记录数，默认100，最大1000
 currency|String|币种
-status|String|状态，PROCESSING-处理中，SUCCESS-成功, FAILURE-失败
+status|String|状态：`PROCESSING`-处理中，`SUCCESS`-成功, `FAILURE`-失败
 ### 返回值  
 字段|含义
 ---|---
@@ -980,7 +984,7 @@ applyId|转出申请Id
 currency|币种
 recRemark|收款账户流水备注
 recSystem|收款服务方
-status|状态PROCESSING-处理中，SUCCESS-成功,FAILURE-失败
+status|状态
 amount|转出金额
 reason|失败原因
 sn|序列号
@@ -999,7 +1003,7 @@ remark|付款账户备注
 }
 ```
 ### HTTP请求
-DELETE /api/v2/cancel/transfer-out
+`DELETE /api/v2/cancel/transfer-out`
 ### 请求示例
 DELETE /api/v2/cancel/transfer-out
 ### API权限
@@ -1023,7 +1027,7 @@ applyId|String|转出申请id
 }
 ```
 ### HTTP请求
-POST /api/v2/transfer-in
+`POST /api/v2/transfer-in`
 ### 请求示例
 POST /api/v2/transfer-in
 ### API权限
@@ -1035,7 +1039,7 @@ POST /api/v2/transfer-in
 ---|---|---
 amount|Number|交易金额
 currency|String|币种
-payAccountType|String|付款账户类型：只能是MAIN-储蓄账户，TRADE-交易账户
+payAccountType|String|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE`-交易账户
 
 
 
@@ -1050,51 +1054,69 @@ payAccountType|String|付款账户类型：只能是MAIN-储蓄账户，TRADE-�
 ## 下单
 ```json
 //response
-{"success": true, "code": "200", "msg": "success", "retry": false, "data": {"orderId": "25880469442662400"}}
+{
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "orderId": "25880469442662400"
+    }
+}
 ```
 ### HTTP请求
-POST /api/v2/order
+`POST /api/v2/order`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
  symbol       | STRING   | YES      | 交易对                                                       
- side         | ENUM     | YES      | 买卖方向 SELL, BUY                                           
+ side         | ENUM     | YES      | 买卖方向 `SELL`, `BUY`                                           
  price        | DECIMAL  | NO       | 价格                                                         
- type         | ENUM     | YES      | 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET 
- size         | INT      | NO       | 下单数量,使用closeOrder不支持此参数                          
+ type         | ENUM     | YES      | 订单类型 `LIMIT`, `MARKET`, `STOP`, `TAKE_PROFIT`, `STOP_MARKET`, `TAKE_PROFIT_MARKET`, `TRAILING_STOP_MARKET` 
+ size         | INT      | NO       | 下单数量,使用`closeOrder`不支持此参数                          
  clientOid    | STRING   | NO       | 唯一的订单ID，可用于识别订单。如：UUID,只能包含数字、字母、下划线（_）或 分隔线（-） 
- reduceOnly   | BOOLEAN  | NO       | [可选] 只减仓标记, 默认值是 false 。值为true时，需要设置平仓数量 
- closeOrder   | BOOLEAN  | NO       | [可选] 平仓单标记, 默认值是 false 。值为true时，代表仓位全平 
- hidden       | BOOLEAN  | NO       | [可选] 订单不会在买卖盘中展示。选择hidden，不允许选择postOnly。 
+ reduceOnly   | BOOLEAN  | NO       | [可选] 只减仓标记, 默认值是 `false` 。值为`true`时，需要设置平仓数量 
+ closeOrder   | BOOLEAN  | NO       | [可选] 平仓单标记, 默认值是 `false` 。值为`true`时，代表仓位全平 
+ hidden       | BOOLEAN  | NO       | [可选] 订单不会在买卖盘中展示。选择`hidden`，不允许选择`postOnly`。 
  visibleSize  | INT      | NO       | [可选] 隐藏单最大可展示的数量。                              
- stopPrice    | DECIMAL  | NO       | 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数 
- postOnly     | BOOLEAN  | NO       | [可选] 只挂单的标识。选择postOnly，不允许选择hidden。当订单时效为IOC策略时，该参数无效。 
- workingType  | STRING   | NO       | [可选] 止损单触发价类型，包括TP和MP                          
+ stopPrice    | DECIMAL  | NO       | 触发价, 仅 `STOP`, `STOP_MARKET`, `TAKE_PROFIT`, `TAKE_PROFIT_MARKET` 需要此参数 
+ postOnly     | BOOLEAN  | NO       | [可选] 只挂单的标识。选择`postOnly`，不允许选择`hidden`。当订单时效为`IOC`策略时，该参数无效。 
+ workingType  | STRING   | NO       | [可选] 止损单触发价类型，包括`TP`和`MP`                          
  timeInForce  | STRING   | NO       | 有效方法                                                     
 
-根据order ***type*** 的不同， 对应需要的参数如下：
+根据order **type** 的不同， 对应需要的参数如下：
 
-| Type                           | 参数                   |
-| ------------------------------ | ---------------------- |
-| LIMIT                          | size, price            |
-| MARKET                         | size                   |
-| STOP,TAKE_PROFIT               | size, price, stopPrice |
-| STOP_MARKET,TAKE_PROFIT_MARKET | size, stopPrice        |
+| Type                               | 参数                          |
+| ---------------------------------- | ---------------------------- |
+| `LIMIT`                            | `size`, `price`              |
+| `MARKET`                           | `size`                       |
+| `STOP`,`TAKE_PROFIT`               | `size`, `price`, `stopPrice `|
+| `STOP_MARKET`,`TAKE_PROFIT_MARKET` | `size`, `stopPrice`          |
 
-条件单触发说明：
-`STOP`, `STOP_MARKET` 止损单：
-    - 买入: 最新合约价格/标记价格高于等于触发价`stopPrice`
-    - 卖出: 最新合约价格/标记价格低于等于触发价`stopPrice`
+* 条件单触发说明：
+    * `STOP`, `STOP_MARKET` 止损单：
+        * 买入: 最新合约价格/标记价格高于等于触发价`stopPrice`
+        * 卖出: 最新合约价格/标记价格低于等于触发价`stopPrice`
 
-`TAKE_PROFIT`, `TAKE_PROFIT_MARKET` 止盈单：
-    - 买入: 最新合约价格/标记价格低于等于触发价`stopPrice`
-    - 卖出: 最新合约价格/标记价格高于等于触发价`stopPrice`
+    * `TAKE_PROFIT`, `TAKE_PROFIT_MARKET` 止盈单：
+        * 买入: 最新合约价格/标记价格低于等于触发价`stopPrice`
+        * 卖出: 最新合约价格/标记价格高于等于触发价`stopPrice`
 
-### 返回
+### 返回值
 属性  | 含义 
 --------- | -----------
 orderId | 订单id 
 
+### 术语解释
+
+### 合约<code>symbol</code>
+合约必须是KuCoin Futures支持的合约，如XBTUSDM。
+
+### 用户订单ID<code>clientOid</code>
+
+ClientOid字段是客户端创建的唯一的ID（推荐使用UUID），只能包含数字、字母、下划线（_） 和 分隔线（-）。这个字段会在获取订单信息时返回。您可使用clientOid来标识您的订单。ClientOid不同于服务端创建的订单ID。请不要使用同一个clientOid发起请求。**clientOid最长不得超过40个字符**。
+
+请妥善记录服务端创建的orderId，以用于查询订单状态的更新。
 
 ## 单个撤单
 ```json
@@ -1108,7 +1130,7 @@ orderId | 订单id
 ```
 
 ### HTTP请求
-DELETE /api/v2/order
+`DELETE /api/v2/order`
 
 ### 参数
 
@@ -1118,7 +1140,10 @@ symbol | STRING | YES | 合约symbol
 orderId | STRING | NO | 订单id 
 clientOid | STRING | NO | 用户自定义orderId 
 
-orderId和clientOid 二选一， 如果都传，默认使用orderId.
+<aside class="notice">
+<code>orderId</code>和<code>clientOid</code>二选一，如果都传，默认使用<code>orderId</code>.
+</aside>
+
 
 
 ## 批量撤单
@@ -1138,7 +1163,7 @@ orderId和clientOid 二选一， 如果都传，默认使用orderId.
 }
 ```
 ### HTTP请求
-DELETE /api/v2/orders
+`DELETE /api/v2/orders`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
@@ -1180,7 +1205,7 @@ orderIds | 成功撤掉的订单id
   }
 ```
 ### HTTP请求
-GET /api/v2/orders/historical-trades
+`GET /api/v2/orders/historical-trades`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | ------------ |
@@ -1196,7 +1221,7 @@ GET /api/v2/orders/historical-trades
 | orderId | 订单ID |
 | symbol | 合约交易对名字 |
 | time | 撮合时间 |
-| side | 方向：BUY:买/做多 SELL:卖/做空 |
+| side | 方向：`BUY`:买/做多 `SELL`:卖/做空 |
 | size | 数量 |
 | price | 价格 |
 | fee | 手续费 |
@@ -1206,19 +1231,19 @@ GET /api/v2/orders/historical-trades
 | pnlCurrency | 盈亏币种 |
 | value | 价值 |
 | orderType | 订单类型 |
-| placeType | 下单类型：DEFAULT、OTOCO、STEP_REDUCE_POSITION、LIQUIDATION_TAKE_OVER、ADL_TRIGGER、ADL_LUCKY |
+| placeType | 下单类型：`DEFAULT`、`OTOCO`、`STEP_REDUCE_POSITION`、`LIQUIDATION_TAKE_OVER`、`ADL_TRIGGER`、`ADL_LUCKY` |
 | maker | 是否maker |
 | forceTaker | 是否强制作为taker处理|
 
 
 ## 查询单个订单详情
 ### HTTP请求
-GET /api/v2/order/detail
+`GET /api/v2/order/detail`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | -- |
-| orderId | String |	|
-| clientOid | String |	|
+| orderId | String |	 订单ID |
+| clientOid | String | 用户自定义orderId |
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1242,7 +1267,7 @@ GET /api/v2/order/detail
 | orderTime | 下单时间 |
 | reduceOnly | 是否只减仓 |
 | status | 订单状态 |
-| placeType | 下单类型：DEFAULT、OTOCO、STEP_REDUCE_POSITION、LIQUIDATION_TAKE_OVER、ADL_TRIGGER、ADL_LUCKY |
+| placeType | 下单类型：`DEFAULT`、`OTOCO`、`STEP_REDUCE_POSITION`、`LIQUIDATION_TAKE_OVER`、`ADL_TRIGGER、ADL_LUCKY` |
 | takeProfitPrice| 订单止盈止损 止盈价格 |
 | cancelSize | 取消数量 |
 | clientOid	| 客户订单编号 |
@@ -1252,7 +1277,7 @@ GET /api/v2/order/detail
 
 ## 查询活跃订单
 ### HTTP请求
-GET /api/v2/orders/active
+`GET /api/v2/orders/active`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | -------------- |
@@ -1268,9 +1293,9 @@ GET /api/v2/orders/active
 | size | 数量 |
 | dealSize | 订单成交数量 |
 | dealValue | 成交价值 |
-| workingType | 触发价格方式：MP（标记价格）、TP（最新成交价） |
+| workingType | 触发价格方式：`MP`（标记价格）、`TP`（最新成交价） |
 | stopPrice | 触发价格，订单止盈止损 止损价格 |
-| timeInForce | GTC: 用户主动取消才过期, IOC:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； FOK：如果下单不能全部成交，则取消； |
+| timeInForce | `GTC`: 用户主动取消才过期, `IOC`:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； `FOK`：如果下单不能全部成交，则取消； |
 | postOnly | 是否只做maker |
 | hidden | 是否是隐藏单 |
 | leverage | 杠杆 |
@@ -1290,7 +1315,7 @@ GET /api/v2/orders/active
 
 ## 查询全部活跃订单
 ### HTTP请求
-GET /api/v2/orders/all-active
+`GET /api/v2/orders/all-active`
 ### 参数
 无
 ### 返回值
@@ -1304,9 +1329,9 @@ GET /api/v2/orders/all-active
 | size | 数量 |
 | dealSize | 订单成交数量 |
 | dealValue | 成交价值 |
-| workingType | 触发价格方式：MP（标记价格）、TP（最新成交价） |
+| workingType | 触发价格方式：`MP`（标记价格）、`TP`（最新成交价） |
 | stopPrice | 触发价格，订单止盈止损 止损价格 |
-| timeInForce | GTC: 用户主动取消才过期, IOC:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； FOK：如果下单不能全部成交，则取消； |
+| timeInForce | `GTC`: 用户主动取消才过期, `IOC`:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘； `FOK`：如果下单不能全部成交，则取消； |
 | postOnly | 是否只做maker |
 | hidden | 是否是隐藏单 |
 | leverage | 杠杆 |
@@ -1362,7 +1387,7 @@ GET /api/v2/orders/all-active
   }
 ```
 ### HTTP请求
-GET /api/v2/orders/history
+`GET /api/v2/orders/history`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | ---------- |
@@ -1405,32 +1430,32 @@ GET /api/v2/orders/history
 ## 获取某个合约的仓位
 ```json
 {
-  "code": "200000",
-  "data": [
-    {
-      "symbol": "BTCUSDM",
-      "qty": 7,
-      "leverage": 5,
-      "marginType": "ISOLATED",
-      "side": "BOTH",
-      "autoDeposit": false,
-      "entryPrice": "45494.04",
-      "entryValue": "-0.0001538663",
-      "margin": "0.0000306810",
-      "totalMargin": "0.00002603090000000000",
-      "liquidationPrice": "38771.12",
-      "unrealisedPnl": "-0.00000465010000000000",
-      "markPrice": "44159.35",
-      "riskRate": "0.1537",
-      "maintenanceMarginRate": "0.0250000000",
-      "maintenanceMargin": "0.000004",
-      "adlPercentile": "1"
-    }
-  ]
+    "code": "200000",
+    "data": [
+        {
+            "symbol": "BTCUSDM",
+            "qty": 7,
+            "leverage": 5,
+            "marginType": "ISOLATED",
+            "side": "BOTH",
+            "autoDeposit": false,
+            "entryPrice": "45494.04",
+            "entryValue": "-0.0001538663",
+            "margin": "0.0000306810",
+            "totalMargin": "0.00002603090000000000",
+            "liquidationPrice": "38771.12",
+            "unrealisedPnl": "-0.00000465010000000000",
+            "markPrice": "44159.35",
+            "riskRate": "0.1537",
+            "maintenanceMarginRate": "0.0250000000",
+            "maintenanceMargin": "0.000004",
+            "adlPercentile": "1"
+        }
+    ]
 }
 ```
 ### HTTP请求
-GET /api/v2/symbol-position
+`GET /api/v2/symbol-position`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1441,16 +1466,16 @@ symbol | String | 是 | 合约symbol
 symbol | 合约symbol | 
 qty | 仓位数量（负数表示做空，正数表示做多） | 
 leverage | 全局杠杆 | 
-marginType | 保证金模式（ISOLATED-逐仓，CROSSED-全仓） | 
-side | 仓位方向（BOTH，LONG，SHORT），当持仓模式为单向仓位时（目前只支持单向持仓），该合约只能有一个仓位，side=BOTH，当持仓模式为双向仓位时，该合约可以有两个反向的仓位,side=LONG 或SHORT | 
-autoDeposit | 是否自动追加保证金（为true时，强平触发自动追加保证金） | 
+marginType | 保证金模式（`ISOLATED`-逐仓，`CROSSED`-全仓） | 
+side | 仓位方向（`BOTH`，`LONG`，`SHORT`），当持仓模式为单向仓位时（目前只支持单向持仓），该合约只能有一个仓位，`side=BOTH`。当持仓模式为双向仓位时，该合约可以有两个反向的仓位,`side=LONG或SHORT` | 
+autoDeposit | 是否自动追加保证金（为`true`时，强平触发自动追加保证金） | 
 entryPrice | 平均开仓价格 | 
 entryValue | 开仓价值 | 
 margin | 仓位保证金 | 
 totalMargin | 仓位总保证金（包含了未实现盈亏） | 
 liquidationPrice | 强平价格 | 
 unrealisedPnl | 未实现盈亏 | 
-riskRate | 仓位风险率（<1，数值越大，风险越高） | 
+riskRate | 仓位风险率（`<1`，数值越大，风险越高） | 
 maintenanceMarginRate | 仓位维持保证金率 | 
 maintenanceMargin | 维持保证金 | 
 adlPercentile | adl排名信息 | 
@@ -1458,32 +1483,32 @@ adlPercentile | adl排名信息 |
 ## 获取所有合约的仓位
 ```json
 {
-  "code": "200000",
-  "data": [
-    {
-      "symbol": "BTCUSDM",
-      "qty": 7,
-      "leverage": 5,
-      "marginType": "ISOLATED",
-      "side": "BOTH",
-      "autoDeposit": false,
-      "entryPrice": "45494.04",
-      "entryValue": "-0.0001538663",
-      "margin": "0.0000306810",
-      "totalMargin": "0.00002603090000000000",
-      "liquidationPrice": "38771.12",
-      "unrealisedPnl": "-0.00000465010000000000",
-      "markPrice": "44159.35",
-      "riskRate": "0.1537",
-      "maintenanceMarginRate": "0.0250000000",
-      "maintenanceMargin": "0.000004",
-      "adlPercentile": "1"
-    }
-  ]
+    "code": "200000",
+    "data": [
+        {
+            "symbol": "BTCUSDM",
+            "qty": 7,
+            "leverage": 5,
+            "marginType": "ISOLATED",
+            "side": "BOTH",
+            "autoDeposit": false,
+            "entryPrice": "45494.04",
+            "entryValue": "-0.0001538663",
+            "margin": "0.0000306810",
+            "totalMargin": "0.00002603090000000000",
+            "liquidationPrice": "38771.12",
+            "unrealisedPnl": "-0.00000465010000000000",
+            "markPrice": "44159.35",
+            "riskRate": "0.1537",
+            "maintenanceMarginRate": "0.0250000000",
+            "maintenanceMargin": "0.000004",
+            "adlPercentile": "1"
+        }
+    ]
 }
 ```
 ### HTTP请求
-GET /api/v2/all-position
+`GET /api/v2/all-position`
 ### 参数
 无
 ### 返回值
@@ -1492,16 +1517,16 @@ GET /api/v2/all-position
 symbol | 合约symbol | 
 qty | 仓位数量（负数表示做空，正数表示做多） | 
 leverage | 全局杠杆 | 
-marginType | 保证金模式（ISOLATED-逐仓，CROSSED-全仓） | 
-side | 仓位方向（BOTH，LONG，SHORT），当持仓模式为单向仓位时（目前只支持单向持仓），该合约只能有一个仓位，side=BOTH，当持仓模式为双向仓位时，该合约可以有两个反向的仓位,side=LONG 或SHORT | 
-autoDeposit | 是否自动追加保证金（为true时，强平触发自动追加保证金） | 
+marginType | 保证金模式（`ISOLATED`-逐仓，`CROSSED`-全仓） | 
+side | 仓位方向（`BOTH`，`LONG`，`SHORT`），当持仓模式为单向仓位时（目前只支持单向持仓），该合约只能有一个仓位，`side=BOTH`。当持仓模式为双向仓位时，该合约可以有两个反向的仓位,`side=LONG或SHORT` | 
+autoDeposit | 是否自动追加保证金（为`true`时，强平触发自动追加保证金） | 
 entryPrice | 平均开仓价格 | 
 entryValue | 开仓价值 | 
 margin | 仓位保证金 | 
 totalMargin | 仓位总保证金（包含了未实现盈亏） | 
 liquidationPrice | 强平价格 | 
 unrealisedPnl | 未实现盈亏 | 
-riskRate | 仓位风险率（<1，数值越大，风险越高） | 
+riskRate | 仓位风险率（`<1`，数值越大，风险越高） | 
 maintenanceMarginRate | 仓位维持保证金率 | 
 maintenanceMargin | 维持保证金 | 
 adlPercentile | adl排名信息 | 
@@ -1509,60 +1534,70 @@ adlPercentile | adl排名信息 |
 ## 增加仓位保证金
 ```json
 {
-  "code": "200000",
-  "data": true
+    "code": "200000",
+    "data": true
 }
 ```
 ### HTTP请求
-POST /api/v2/change-margin
+`POST /api/v2/change-margin`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
 symbol | String | 是 | 合约symbol
-positionSide | String | 是 | 目前只支持BOTH
+positionSide | String | 是 | 目前只支持`BOTH`
 amount | BigDecimal | 是 | 增减保证金数量，负数提取保证金，正数为增加仓位保证金
 ### 返回值
 属性  | 含义 |  
 --------- | -----------|
-data | true 表示增减保证金成功 | 
+data | `true` 表示增减保证金成功 | 
 
 ## 仓位盈亏历史
 ```json
 {
-  "code": "200000",
-  "data": [
-    {
-      "symbol":"LINKUSDTM",
-      "settleCurrency":"USDT",
-      "type":"CLOSE_LONG",
-      "leverage":5,
-      "pnl":"-0.006",
-      "roe":"-0.0098", 
-      "openTime":1649299430000,
-      "closeTime":1649299436000,
-      "openPrice":"15.37",
-      "closePrice":"15.34"
-    }
-  ]
+    "code": "200000",
+    "data": [
+        {
+            "symbol": "LINKUSDTM",
+            "settleCurrency": "USDT",
+            "type": "CLOSE_LONG",
+            "leverage": 5,
+            "pnl": "-0.006",
+            "roe": "-0.0098",
+            "openTime": 1649299430000,
+            "closeTime": 1649299436000,
+            "openPrice": "15.37",
+            "closePrice": "15.34"
+        }
+    ]
 }
 ```
 ### HTTP请求
-GET /api/v2/close-pnl-his
+`GET /api/v2/close-pnl-his`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
 symbol | String | 否 | 合约symbol
-type | String | 否 | 平仓类型（CLOSE_LONG-手动平多，CLOSE_SHORT-手动平多，LIQUID_LONG-强制平多，LIQUID_SHORT-强制平空，ADL_LONG-adl平多，ADL_SHORT-adl平空）
+type | String | 否 | 平仓类型
 settleCurrency | String | 否 | 合约结算币种
-startAt | String | 否 | 开始时间（时间跨度最多3个月）
-endAt | String | 否 | 截止时间（时间跨度最多3个月）
-limit | int | 是 | 记录数（默认50，最大1000）
+startAt | String | 否 | 开始时间（时间跨度最多`3`个月）
+endAt | String | 否 | 截止时间（时间跨度最多`3`个月）
+limit | int | 是 | 记录数（默认`50`，最大`1000`）
+
+* `type`平仓类型说明：
+    * `CLOSE_LONG`（手动平多）
+    * `CLOSE_SHORT`（手动平空）
+    * `LIQUID_LONG`（强制平多）
+    * `LIQUID_SHORT`（强制平空）
+    * `ADL_LONG`（adl平多）
+    * `ADL_SHORT`（adl平空）
+
+
 ### 返回值
 属性  | 含义 |  
 --------- | -----------|
 symbol | 合约symbol| 
 settleCurrency | 合约结算币种 | 
-type | 平仓类型（CLOSE_LONG，CLOSE_SHORT-用户操作手动平多空仓，LIQUID_LONG，LIQUID_SHORT-强制平多空仓，ADL_LONG，ADL_SHORT-adl平多空仓） | 
+type | 平仓类型 | 
 leverage | 平仓时的全局杠杆 | 
 pnl | 平仓盈亏 | 
 roe | 收益率 | 
@@ -1580,46 +1615,46 @@ closePrice | 平仓价格 |
 ## 获取所有开放合约信息
 ```json
 {
-  "code": "200000",
-  "data": [
-    {
-      "symbol": "BTCUSDTM",
-      "type": "FFWCSX",
-      "firstOpenDate": 1585555200000,
-      "expireDate": null,
-      "settleDate": null,
-      "baseCurrency": "BTC",
-      "quoteCurrency": "USDT",
-      "settleCurrency": "USDT",
-      "maxOrderQty": 1000000,
-      "maxPrice": 1000000,
-      "lotSize": 1,
-      "tickSize": 1,
-      "indexPriceTickSize": 0.01,
-      "multiplier": 0.001,
-      "makerFeeRate": 0.0002,
-      "takerFeeRate": 0.0006,
-      "settlementFeeRate": 0.0006,
-      "isInverse": false,
-      "fundingBaseSymbol": ".BTCINT8H",
-      "fundingQuoteSymbol": ".USDTINT8H",
-      "fundingRateSymbol": ".BTCUSDTMFPI8H",
-      "indexSymbol": ".KBTCUSDT",
-      "settlementSymbol": "",
-      "status": "Open"
-    }
-  ]
+    "code": "200000",
+    "data": [
+        {
+            "symbol": "BTCUSDTM",
+            "type": "FFWCSX",
+            "firstOpenDate": 1585555200000,
+            "expireDate": null,
+            "settleDate": null,
+            "baseCurrency": "BTC",
+            "quoteCurrency": "USDT",
+            "settleCurrency": "USDT",
+            "maxOrderQty": 1000000,
+            "maxPrice": 1000000,
+            "lotSize": 1,
+            "tickSize": 1,
+            "indexPriceTickSize": 0.01,
+            "multiplier": 0.001,
+            "makerFeeRate": 0.0002,
+            "takerFeeRate": 0.0006,
+            "settlementFeeRate": 0.0006,
+            "isInverse": false,
+            "fundingBaseSymbol": ".BTCINT8H",
+            "fundingQuoteSymbol": ".USDTINT8H",
+            "fundingRateSymbol": ".BTCUSDTMFPI8H",
+            "indexSymbol": ".KBTCUSDT",
+            "settlementSymbol": "",
+            "status": "Open"
+        }
+    ]
 }
 ```
 ### HTTP请求
-GET /api/v2/contracts/active
+`GET /api/v2/contracts/active`
 ### 参数
 无
 ### 返回值
 属性  | 含义 |  
 --------- | -----------|
 symbol | 合约symbol | 
-type | 合约类型（FFWCSX-永续，FFICSX-交割） | 
+type | 合约类型：`FFWCSX`(永续)，`FFICSX`(交割） | 
 firstOpenDate | 首次开放时间 | 
 expireDate | 合约到期时间（永续合约用不过期） | 
 settleDate | 交割合约交割时间 | 
@@ -1641,43 +1676,43 @@ fundingQuoteSymbol | 资金费用计价货币symbol |
 fundingRateSymbol | 资金费率symbol | 
 indexSymbol | 指数symbol | 
 settlementSymbol | 结算symbol | 
-status | Open(已上线)、PrepareSettled(准备结算)、BeingSettled（结算中）、Paused(已暂停)、CancelOnly(只能撤单) | 
+status | 状态：`Open`(已上线)`、PrepareSettled`(准备结算)、`BeingSettled`（结算中）、`Paused`(已暂停)、`CancelOnly`(只能撤单) |  
 
 
 ## 获取某个合约
 ```json
 {
-  "code": "200000",
-  "data": {
-    "symbol": "BTCUSDTM",
-    "type": "FFWCSX",
-    "firstOpenDate": 1585555200000,
-    "expireDate": null,
-    "settleDate": null,
-    "baseCurrency": "BTC",
-    "quoteCurrency": "USDT",
-    "settleCurrency": "USDT",
-    "maxOrderQty": 1000000,
-    "maxPrice": 1000000,
-    "lotSize": 1,
-    "tickSize": 1,
-    "indexPriceTickSize": 0.01,
-    "multiplier": 0.001,
-    "makerFeeRate": 0.0002,
-    "takerFeeRate": 0.0006,
-    "settlementFeeRate": 0.0006,
-    "isInverse": false,
-    "fundingBaseSymbol": ".BTCINT8H",
-    "fundingQuoteSymbol": ".USDTINT8H",
-    "fundingRateSymbol": ".BTCUSDTMFPI8H",
-    "indexSymbol": ".KBTCUSDT",
-    "settlementSymbol": "",
-    "status": "Open"
-  }
+    "code": "200000",
+    "data": {
+        "symbol": "BTCUSDTM",
+        "type": "FFWCSX",
+        "firstOpenDate": 1585555200000,
+        "expireDate": null,
+        "settleDate": null,
+        "baseCurrency": "BTC",
+        "quoteCurrency": "USDT",
+        "settleCurrency": "USDT",
+        "maxOrderQty": 1000000,
+        "maxPrice": 1000000,
+        "lotSize": 1,
+        "tickSize": 1,
+        "indexPriceTickSize": 0.01,
+        "multiplier": 0.001,
+        "makerFeeRate": 0.0002,
+        "takerFeeRate": 0.0006,
+        "settlementFeeRate": 0.0006,
+        "isInverse": false,
+        "fundingBaseSymbol": ".BTCINT8H",
+        "fundingQuoteSymbol": ".USDTINT8H",
+        "fundingRateSymbol": ".BTCUSDTMFPI8H",
+        "indexSymbol": ".KBTCUSDT",
+        "settlementSymbol": "",
+        "status": "Open"
+    }
 }
 ```
 ### HTTP请求
-GET /api/v1/contracts/{symbol}
+`GET /api/v1/contracts/{symbol}`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1686,7 +1721,7 @@ symbol | String | 是 | 合约symbol
 属性  | 含义 |  
 --------- | -----------|
 symbol | 合约symbol | 
-type | 合约类型（FFWCSX-永续，FFICSX-交割） | 
+type | 合约类型：`FFWCSX`(永续)，`FFICSX`(交割） | 
 firstOpenDate | 首次开放时间 | 
 expireDate | 合约到期时间（永续合约用不过期） | 
 settleDate | 交割合约交割时间 | 
@@ -1708,36 +1743,36 @@ fundingQuoteSymbol | 资金费用计价货币symbol |
 fundingRateSymbol | 资金费率symbol | 
 indexSymbol | 指数symbol | 
 settlementSymbol | 结算symbol | 
-status | Open(已上线)、PrepareSettled(准备结算)、BeingSettled（结算中）、Paused(已暂停)、CancelOnly(只能撤单) | 
+status | 状态：`Open`(已上线)`、PrepareSettled`(准备结算)、`BeingSettled`（结算中）、`Paused`(已暂停)、`CancelOnly`(只能撤单) | 
 
 ## 获取合约的风险限额列表
 ```json
 {
-  "code": "200000",
-  "data": [
-    {
-      "symbol": "ADAUSDTM",
-      "level": 1,
-      "maxRiskLimit": 500,
-      "minRiskLimit": 0,
-      "maxLeverage": 20,
-      "initialMarginRate": 0.05,
-      "maintenanceMarginRate": 0.025
-    },
-    {
-      "symbol": "ADAUSDTM",
-      "level": 2,
-      "maxRiskLimit": 1000,
-      "minRiskLimit": 500,
-      "maxLeverage": 2,
-      "initialMarginRate": 0.5,
-      "maintenanceMarginRate": 0.25
-    }
-  ]
+    "code": "200000",
+    "data": [
+        {
+            "symbol": "ADAUSDTM",
+            "level": 1,
+            "maxRiskLimit": 500,
+            "minRiskLimit": 0,
+            "maxLeverage": 20,
+            "initialMarginRate": 0.05,
+            "maintenanceMarginRate": 0.025
+        },
+        {
+            "symbol": "ADAUSDTM",
+            "level": 2,
+            "maxRiskLimit": 1000,
+            "minRiskLimit": 500,
+            "maxLeverage": 2,
+            "initialMarginRate": 0.5,
+            "maintenanceMarginRate": 0.25
+        }
+    ]
 }
 ```
 ### HTTP请求
-GET /api/v2/contracts/risk-limit/{symbol}
+`GET /api/v2/contracts/risk-limit/{symbol}`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1756,7 +1791,7 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 
 ## 查询资金费用结算历史
 ```json
-  {
+{
     "success": true,
     "code": "200",
     "msg": "success",
@@ -1778,18 +1813,18 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
         ],
         "hasMore": true
     }
-  }
+}
 ```
 ### HTTP请求
-GET /api/v2/funding-history
+`GET /api/v2/funding-history`
 ### 参数
 | 参数    | 数据类型 | 含义                                                  |
 | :------ | -------- | ------------------------------ |
 | symbol  | String   | 合约symbol                                            |
 | startAt | Long     | [可选] 开始时间（毫秒）                               |
 | endAt   | Long     | [可选] 截止时间（毫秒）                               |
-| limit   | Integer  | 默认 50; 最大 1000.                             |
-| fromId  | Long     | [可选] 从哪一条成交id开始返回. 缺省返回最近的成交记录 |
+| limit   | Integer  | 默认 `50`; 最大 `1000`.                             |
+| fromId  | Long     | [可选] 从哪一条成交`id`开始返回. 缺省返回最近的成交记录 |
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1807,56 +1842,55 @@ GET /api/v2/funding-history
 
 ## 获取合约K线数据
 ```json
-  {
+{
     "success": true,
     "code": "200",
     "msg": "success",
     "retry": false,
     "data": [
-      [
-        "1649642340000", 	//时间
-        15.748,						//开盘价
-        15.748,						//最高价
-        15.736,						//最低价
-        15.736,						//收盘价
-        656								//成交量
-      ]
+        [
+            "1649642340000", //时间
+            15.748, //开盘价
+            15.748, //最高价
+            15.736, //最低价
+            15.736, //收盘价
+            656 //成交量
+        ]
     ]
-  }
+}
 ```
 ### HTTP请求
-GET /api/v2/kline/query
+`GET /api/v2/kline/query`
 ### 参数
 | 参数     | 数据类型 | 含义  |
 | :------- | -------- | -----|
 | from   |  Long  | 起始时间（毫秒） |
 | to   | Long | 结束时间（毫秒） |
-| granularity   | Integer   | 代表分钟数，可选范围：1,5,15,30,60,120,240,480,720,1440,10080 |
+| granularity   | Integer   | 代表分钟数，可选范围：`1`,`5`,`15`,`30`,`60`,`120`,`240`,`480`,`720`,`1440`,`10080` |
 | symbol   | String   | 合约symbol |
-
 
 ## 查询资金费率列表
 ```json
-  {
+{
     "success": true,
     "code": "200",
     "msg": "success",
     "retry": false,
     "data": {
-      "dataList": [
-        {
-          "symbol": "SHIBUSDTM",
-          "granularity": "28800000",
-          "timePoint": "1649160000000",
-          "value": "0.000100"
-        }
-      ],
-      "hasMore": false
+        "dataList": [
+            {
+                "symbol": "SHIBUSDTM",
+                "granularity": "28800000",
+                "timePoint": "1649160000000",
+                "value": "0.000100"
+            }
+        ],
+        "hasMore": false
     }
-  }
+}
 ```
 ### HTTP请求
-GET /api/v2/contract/{symbol}/funding-rates
+`GET /api/v2/contract/{symbol}/funding-rates`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | --------- |
@@ -1879,45 +1913,30 @@ GET /api/v2/contract/{symbol}/funding-rates
 ## 获取买卖盘
 ```json
 {
-  "success": true,
-  "code": "200",
-  "msg": "success",
-  "retry": false,
-  "data": {
-    "contractId": 206,
-    "symbol": "LINKUSDTM",
-    "ts": 1649746178803,
-    "sequence": 102,
-    "asks": [
-      [
-        "13.965",
-        202
-      ],
-      [
-        "13.970",
-        101
-      ]
-    ],
-    "bids": [
-      [
-        "13.942",
-        164
-      ],
-      [
-        "13.937",
-        164
-      ],
-      [
-        "13.928",
-        178
-      ]
-    ]
-  }
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "contractId": 206,
+        "symbol": "LINKUSDTM",
+        "ts": 1649746178803,
+        "sequence": 102,
+        "asks": [
+            ["13.965",202],
+            ["13.970",101]
+        ],
+        "bids": [
+            ["13.942",164],
+            ["13.937",164],
+            ["13.928",178]
+        ]
+    }
 }
 ```
 返回买卖盘数据
 ### HTTP请求
-GET /api/v2/order-book
+`GET /api/v2/order-book`
 ### 参数
 | 字段   | 类型   | 是否必需 | 说明                                |
 | ------ | ------ | -------- | ----------------------------------- |
@@ -1944,14 +1963,14 @@ GET /api/v2/order-book
     "symbol": "LINKUSDTM",
     "askPrice": "13.965",
     "askSize": 202,
-    "bidPrice" "13.942",
+    "bidPrice": "13.942",
     "bidSize": 164
   }
 }
 ```
 返回买卖盘最佳买一卖一价
 ### HTTP请求
-GET /api/v2/ticker/bookTicker
+`GET /api/v2/ticker/bookTicker`
 ### 参数
 | 字段   | 类型   | 是否必需 | 说明     |
 | ------ | ------ | -------- | -------- |
@@ -1971,20 +1990,20 @@ GET /api/v2/ticker/bookTicker
 ## 获取最新成交价
 ```json
 {
-  "success": true,
-  "code": "200",
-  "msg": "success",
-  "retry": false,
-  "data": {
-    "symbol": "LINKUSDTM",
-    "ts": 1649744712820,
-    "price": "13.774",
-  }
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "symbol": "LINKUSDTM",
+        "ts": 1649744712820,
+        "price": "13.774",
+    }
 }
 ```
 返回最新成交价
 ### HTTP请求
-GET /api/v2/ticker/price
+`GET /api/v2/ticker/price`
 ### 参数
 | 字段   | 类型   | 是否必需 | 说明     |
 | ------ | ------ | -------- | -------- |
@@ -2001,55 +2020,55 @@ GET /api/v2/ticker/price
 
 ## 获取最近成记录
 ```json
-	{
-  "success": true,
-  "code": "200",
-  "msg": "success",
-  "retry": false,
-  "data": [
-    {
-      "symbol": "ETHUSDTM",
-      "matchSide": "buy",
-      "price": "2929.90",
-      "size": 10,
-      "ts": 1649744581941
-    }
-  ]
-}
+{
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": [
+      {
+        "symbol": "ETHUSDTM",
+        "matchSide": "buy",
+        "price": "2929.90",
+        "size": 10,
+        "ts": 1649744581941
+      }
+    ]
+  }
 ```
 返回最近成交记录
 ### HTTP请求
-GET /api/v2/trades
+`GET /api/v2/trades`
 ### 参数
 | 字段   | 类型   | 是否必需 | 说明                             |
 | ------ | ------ | -------- | -------------------------------- |
 | symbol | 字符串 | Y        | 合约名称                         |
 | limit  | 数字   | N        | 返回记录条数，默认20，范围1~1000 |
 ### 返回值
-| 字段   | 含义                        |
-| ------ | --------------------------- |
-| symbol | 合约名称                    |
-| ts     | 成交时间戳                  |
-| side   | taker方向，枚举值：buy/sell |
-| price  | 成交价格                    |
-| size   | 成交数量                    |
+| 字段   | 含义                           |
+| ------ | ----------------------------- |
+| symbol | 合约名称                       |
+| ts     | 成交时间戳                     |
+| side   | taker方向，枚举值：`buy`,`sell` |
+| price  | 成交价格                       |
+| size   | 成交数量                       |
 
 
 # 时间
 ## 获取服务器时间
 
 ```json
-  {  
-    "code":"200000",
-    "msg":"success",
-    "data":1546837113087
-  }
+{
+    "code": "200000",
+    "msg": "success",
+    "data": 1546837113087
+}
 ```
 
 获取API服务器时间。这是Unix时间戳。
 
 ### HTTP请求
-GET /api/v1/timestamp
+`GET /api/v1/timestamp`
 
 ### 返回值
 字段 | 含义
@@ -2061,22 +2080,22 @@ data | 服务器时间, Unix时间戳。
 
 ## 获取当前服务状态
 ```json
-  {    
-    "code": "200000",     
+{
+    "code": "200000",
     "data": {
-        "status": "open",                //open: 正常运行, close: 服务关闭, cancelonly:只能撤单
-        "msg":  "upgrade match engine"   //备注
-      }
-  }
+        "status": "open", //open: 正常运行, close: 服务关闭, cancelonly:只能撤单
+        "msg": "upgrade match engine" //备注
+    }
+}
 ```
 获取当前服务状态
 ### HTTP请求
-GET /api/v1/status
+`GET /api/v1/status`
 
 ### 返回值
 字段 | 含义
 --------- | -------
-status | 服务状态。open: 正常运行, close: 服务关闭, cancelonly:只能撤单
+status | 服务状态：`open`（正常运行）、`close`（服务关闭）、`cancelonly`（只能撤单）
 msg | 备注
 
 
@@ -2090,7 +2109,7 @@ REST API的使用受到了访问频率的限制，因此推荐您使用Websocket
 ## 申请连接令牌
 
 ```json
-  {
+{
     "code": "200000",
     "data": {
         "instanceServers": [
@@ -2104,7 +2123,7 @@ REST API的使用受到了访问频率的限制，因此推荐您使用Websocket
         ],
         "token": "vYNlCtbz4XNJ1QncwWilJnBtmmfe4geLQDUA62kKJsDChc6I4bRDQc73JfIrlFaVYIAE0Gv2--MROnLAgjVsWkcDq_MuG7qV7EktfCEIphiqnlfpQn4Ybg==.IoORVxR2LmKV7_maOR9xOg=="
     }
-  }
+}
 ```
 
 在创建Websocket连接前，您需申请一个令牌（Token）。
@@ -2116,12 +2135,12 @@ REST API的使用受到了访问频率的限制，因此推荐您使用Websocket
 如果您只订阅公共频道的数据，请按照以下方式请求获取服务器列表和临时公共令牌。
 
 #### HTTP请求
-POST /api/v1/bullet-public
+`POST /api/v1/bullet-public`
 
 ### 私有频道（需要验证签名）
 
 ```json
-  {
+{
     "code": "200000",
     "data": {
         "instanceServers": [
@@ -2135,14 +2154,14 @@ POST /api/v1/bullet-public
         ],
         "token": "vYNlCtbz4XNJ1QncwWilJnBtmmfe4geLQDUA62kKJsDChc6I4bRDQc73JfIrlFaVYIAE0Gv2--MROnLAgjVsWkcDq_MuG7qV7EktfCEIphiqnlfpQn4Ybg==.IoORVxR2LmKV7_maOR9xOg=="
     }
-  }
+}
 ```
 
 如您需请求私有频道的数据（如：账户资金变化），请在签名验证后按照以下方式获取Websocket的服务实例和已验签的令牌。
 
 
 #### HTTP 请求
-POST /api/v1/bullet-private
+`POST /api/v1/bullet-private`
 
 
 ### 返回值
@@ -2165,10 +2184,10 @@ var socket = new WebSocket("wss://push.kucoin.com/endpoint?token=xxx&[connectId=
 成功建立连接后，您将会收到系统向您发出的欢迎（welcome）消息。
 
 ```json
-  {
-    "id":"hQvf8jkno",
-    "type":"welcome"
-  } 
+{
+    "id": "hQvf8jkno",
+    "type": "welcome"
+}
 ```
 
 **connectId**：连接ID，是客户端生成的唯一标识。您在创建连接时收到的欢迎（welcome）消息的ID以及错误消息的ID都属于连接ID（connectId）。
@@ -2176,10 +2195,10 @@ var socket = new WebSocket("wss://push.kucoin.com/endpoint?token=xxx&[connectId=
 
 ## Ping
 ```json
-  {
-    "id":"1545910590801",
-    "type":"ping"
-  }
+{
+    "id": "1545910590801",
+    "type": "ping"
+}
 ```
 
 为防止服务器断开TCP连接，客户端需要向服务器发送ping消息以保持连接的活跃性。
@@ -2190,33 +2209,33 @@ var socket = new WebSocket("wss://push.kucoin.com/endpoint?token=xxx&[connectId=
 
 
 ```json
-  {
-    "id":"1545910590801",
-    "type":"pong"
-  }
+{
+    "id": "1545910590801",
+    "type": "pong"
+}
 ```
 
 ## 订阅数据
 
 ```json
-  {
-    "id": 1545910660739,                          //表示ID的唯一值 
+{
+    "id": 1545910660739, //表示ID的唯一值 
     "type": "subscribe",
-    "topic": "/market/ticker:XBTUSDM",  // 被订阅的频道。一些频道支持使用“,”分开订阅多个合约的信息推送。
-    "privateChannel": false,                      // 是否使用了私有频道，默认设置为“false”。
-    "response": true                              // 服务器是否需要返回该频道推送的信息。默认设置为“false”。
-  }
+    "topic": "/market/ticker:XBTUSDM", // 被订阅的频道。一些频道支持使用“,”分开订阅多个合约的信息推送。
+    "privateChannel": false, // 是否使用了私有频道，默认设置为“false”。
+    "response": true // 服务器是否需要返回该频道推送的信息。默认设置为“false”。
+}
 ```
 
 使用服务器订阅消息时，客户端应向服务器发送订阅消息。
 
-订阅成功后，当“response”参数为“false”时，系统将向您发出“ack”消息。
+订阅成功后，当`response`参数为`true`时，系统将向您发出`ack`消息。
 
 ```json
-  {
-    "id":"1545910660739",
-    "type":"ack"
-  }
+{
+    "id": "1545910660739",
+    "type": "ack"
+}
 ```
 
 当订阅频道产生新消息时，系统将向客户端推送消息。了解消息格式，请查看频道介绍。
@@ -2231,10 +2250,10 @@ ID用于标识请求和ack的唯一字符串。
 
 #### PrivateChannel
 
-您可通过privateChannel参数订阅以一些用户私有的topic（如：/contractMarket/level2）。该参数默认设置为“false”。设置为“true”时，则您只能收到与您订阅的topic相关的内容推送。
+您可通过privateChannel参数订阅以一些用户私有的topic（如：`/contractMarket/level2`）。该参数默认设置为`false`。设置为`true`时，则您只能收到与您订阅的topic相关的内容推送。
 
 #### Response
-若设置为True, 用户成功订阅后，系统将返回ack消息。
+若设置为`true`, 用户成功订阅后，系统将返回ack消息。
 
 ## 退订
 用于取消您之前订阅的topic
@@ -2282,26 +2301,26 @@ ID用于标识请求和ack的唯一字符串。
 您订阅的topic内容。
 
 #### PrivateChannel
-您可通过privateChannel参数订阅以一些公共topic（如：/contractMarket/tradeOrders）。该参数默认设置为“false”。设置为“true”，您只能收到与您订阅相关的内容推送。
+您可通过privateChannel参数订阅以一些公共topic（如：`/contractMarket/tradeOrders`）。该参数默认设置为`false`。设置为`true`，您只能收到与您订阅相关的内容推送。
 
 #### Response
-若设置为True, 用户成功取消订阅后，系统将返回ack消息。
+若设置为`True`, 用户成功取消订阅后，系统将返回`ack`消息。
 
 ## 多路复用
  在一条物理连接上，您可开启多条多路复用通道，以订阅不同topic，获取多种数据推送。
 
 例如：
 请输入以下指令定开启多条bt1通道
- {"id": "1Jpg30DEdU", "type": "openTunnel", "newTunnelId": "bt1", "response": true}
+ `{"id": "1Jpg30DEdU", "type": "openTunnel", "newTunnelId": "bt1", "response": true}`
 
-在指定中添加参数**tunnelId**：
-{"id": "1JpoPamgFM", "type": "subscribe", "topic": "/market/ticker:XBTUSDM"，"tunnelId": "bt1", "response": true}
+在指定中添加参数**`tunnelId`**：
+`{"id": "1JpoPamgFM", "type": "subscribe", "topic": "/market/ticker:XBTUSDM"，"tunnelId": "bt1", "response": true}`
 
-请求成功后，您将收到 **tunnelIId** 对应的消息推送：
-{"id": "1JpoPamgFM", "type": "message", "topic": "/market/ticker:XBTUSDM", "subject": "trade.ticker", "tunnelId": "bt1", "data": {...}}
+请求成功后，您将收到 **`tunnelIId`** 对应的消息推送：
+`{"id": "1JpoPamgFM", "type": "message", "topic": "/market/ticker:XBTUSDM", "subject": "trade.ticker", "tunnelId": "bt1", "data": {...}}`
 
-关闭**通道**，请输入以下指令：
-{"id": "1JpsAHsxKS", "type": "closeTunnel", "tunnelId": "bt1", "response": true}
+关闭**`通道`**，请输入以下指令：
+`{"id": "1JpsAHsxKS", "type": "closeTunnel", "tunnelId": "bt1", "response": true}`
 
 ##### 限制
 
@@ -2334,21 +2353,21 @@ ID用于标识请求和ack的唯一字符串。
   }
 ```
 
-Topic: **/futuresMarket/ticker:{symbol}**
+Topic: `/futuresMarket/ticker:{symbol}`
 
 ```json
-  {
+{
     "subject": "ticker",
     "topic": "/futuresMarket/ticker:XBTUSDM",
     "data": {
-      "symbol": "XBTUSDM",					// 行情
-      "bestBidSize": 795,					// 最佳买一价总数量
-      "bestBidPrice": 3200.00,			// 最佳买一价
-      "bestAskPrice": 3600.00,			// 最佳卖一价
-      "bestAskSize": 284,					// 最佳卖一价总数量
-      "ts": 1650447469782		// 成交时间 - 毫秒
-   }
-  }
+        "symbol": "XBTUSDM", // 行情
+        "bestBidSize": 795, // 最佳买一价总数量
+        "bestBidPrice": 3200.00, // 最佳买一价
+        "bestAskPrice": 3600.00, // 最佳卖一价
+        "bestAskSize": 284, // 最佳卖一价总数量
+        "ts": 1650447469782 // 成交时间 - 毫秒
+    }
+}
 ```
 订阅此topic，可获取指定交易对的最佳买一和卖一价（BBO）的数据推送。
 <br/>
@@ -2370,80 +2389,112 @@ Topic: **/futuresMarket/ticker:{symbol}**
 ## Level 2 市场行情
 
 ```json
-  {
-    "id": 1545910660740,                          
+//订阅示例
+{
+    "id": 1545910660740,
     "type": "subscribe",
     "topic": "/futuresMarket/level2:XBTUSDM",
-    "response": true                              
-  }
+    "response": true
+}
 ```
-
-Topic：**/futuresMarket/level2:{symbol}**
-
-订阅此topic，获取Level 2买卖盘数据。
-
-订阅成功后，Websocket系统将向您推送增量数据的消息。
-
 ```json
-  {
+//返回示例
+{
     "subject": "level2",
     "topic": "/futuresMarket/level2:XBTUSDM",
     "type": "message",
     "data": {
-      "start":20711,
-      "end":20712,
-      "bids":[],
-      "asks":[["14.250",30]],
-      "ts":1650447324950
-      }
-  }
+        "start": 20711,
+        "end": 20712,
+        "bids": [],
+        "asks": [
+            ["14.250",30]
+        ],
+        "ts": 1650447324950
+    }
+}
 ```
+
+Topic：`/futuresMarket/level2:{symbol}`
+
+订阅此topic，获取Level 2买卖盘数据，订阅成功后，Websocket系统将向您推送增量数据的消息。
+
 
 校准流程：
 
-1. 订阅 /futuresMarket/level2:BTCUSDTM
+1. 订阅 `/futuresMarket/level2:BTCUSDTM`
 2. 开始缓存收到的更新。同一个价位，后收到的更新覆盖前面的。
-3. 访问Rest接口 /v2/order-book?symbol=BTCUSDTM&limit=1000获得一个1000档的深度快照
-4. 将目前缓存到的信息中end< 步骤3中获取到的快照中的start的部分丢弃(丢弃更早的信息，已经过期)
-5. 将深度快照中的内容更新到本地orderbook副本中，本地保存lastUpdateId=最后一个增量消息的end，并从websocket接收到的第一个start <= lastUpdateId 且 end > lastUpdateId 的event开始继续更新本地副本。
-6. 每一个新的event的start应该小于或等于上一个event的end,否则可能出现了丢包，请从step3重新进行初始化。
+3. 访问Rest接口`/api/v2/order-book?symbol=BTCUSDTM&limit=1000`获得一个1000档的深度快照
+4. 将目前缓存到的信息中`end`<步骤3中获取到的快照中的`start`的部分丢弃(丢弃更早的信息，已经过期)
+5. 将深度快照中的内容更新到本地orderbook副本中，本地保存`lastUpdateId`=最后一个增量消息的`end`，并从websocket接收到的第一个`start <= lastUpdateId` 且 `end > lastUpdateId` 的event开始继续更新本地副本。
+6. 每一个新的event的`start`应该小于或等于上一个event的`end`,否则可能出现了丢包，请从step3重新进行初始化。
 7. 每一个event中的挂单量代表这个价格目前的挂单量绝对值，而不是相对变化。
-8. 如果某个价格对应的挂单量为0，表示该价位的挂单已经撤单或者被吃，应该移除这个价位。
-
+8. 如果某个价格对应的挂单量为`0`，表示该价位的挂单已经撤单或者被吃，应该移除这个价位。
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 ## 成交记录 
 ```json
-  {
-    "id": 1545910660741,                          
+//订阅示例
+{
+    "id": 1545910660741,
     "type": "subscribe",
     "topic": "/futuresMarket/execution:XBTUSDM",
-    "response": true                              
-  }
+    "response": true
+}
 ```
-Topic: **/futuresMarket/execution:{symbol}**
-
-每撮合一笔订单，系统就会按照如下格式向您推送消息：
-
 ```json
- {
-   "topic": "/futuresMarket/execution:XBTUSDM",
-   "subject": "execution",
-   "data": {
-        "symbol": "XBTUSDM",				// 合约
-        "matchSide": "sell",           // 成交方向 buy/sell
-        "size": 1,							// 订单剩余数量
-        "price": 3200.00,					// 成交价格
-        "tradeId": 21518,  // 成交编号
-        "ts": 1650447324950       // 时间毫秒
+//返回示例
+{
+    "topic": "/futuresMarket/execution:XBTUSDM",
+    "subject": "execution",
+    "data": {
+        "symbol": "XBTUSDM", // 合约
+        "matchSide": "sell", // 成交方向 buy/sell
+        "size": 1, // 订单剩余数量
+        "price": 3200.00, // 成交价格
+        "tradeId": 21518, // 成交编号
+        "ts": 1650447324950 // 时间毫秒
     }
- }
+}
 ```
 
+Topic: `/futuresMarket/execution:{symbol}`
+
+每撮合一笔订单，系统就会推送此订单成交记录消息
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 
 ## level2的5档全量数据推送频道 
 
-Topic: **/futuresMarket/level2Depth5:{symbol}**
+Topic: `/futuresMarket/level2Depth5:{symbol}`
+
+* 推送频率: `100ms`一次
 
 ```json
 {
@@ -2471,7 +2522,6 @@ Topic: **/futuresMarket/level2Depth5:{symbol}**
     }
  }
 ```
-推送频率为最多100ms一次。
 
 
 <br/>
@@ -2501,35 +2551,35 @@ Topic: **/futuresMarket/level2Depth5:{symbol}**
 
 ## level2的50档全量数据推送频道
 
-Topic: **/futuresMarket/level2Depth50:{symbol}**
+Topic: `/futuresMarket/level2Depth50:{symbol}`
+
+* 推送频率: `100ms`一次
 
 ```json
 {
-   "type": "message",
-   "topic": "/futuresMarket/level2Depth50:BTCUSDM",
-   "subject": "level2Depth5",
-   "data": {
-       "sequence":243,
-       "asks":[
-         ["9993", "3"],
-         ["9992", "3"],
-         ["9991", "47"],
-         ["9990", "32"],
-         ["9989", "8"]
-       ],
-       "bids":[
-         ["9988", "56"],
-         ["9987", "15"],
-         ["9986", "100"],
-         ["9985", "10"],
-         ["9984", "10"]
-  
-       ],
-       "ts": 1650447324950       // 时间毫秒
+    "type": "message",
+    "topic": "/futuresMarket/level2Depth50:BTCUSDM",
+    "subject": "level2Depth5",
+    "data": {
+        "sequence": 243,
+        "asks": [
+            ["9993", "3"],
+            ["9992", "3"],
+            ["9991", "47"],
+            ["9990", "32"],
+            ["9989", "8"]
+        ],
+        "bids":[
+            ["9988", "56"],
+            ["9987", "15"],
+            ["9986", "100"],
+            ["9985", "10"],
+            ["9984", "10"]
+        ],
+        "ts": 1650447324950 // 时间毫秒
     }
- }
+}
 ```
-推送频率为最多100ms一次。
 <br/>
 <br/>
 <br/>
@@ -2555,21 +2605,21 @@ Topic: **/futuresMarket/level2Depth50:{symbol}**
 
 ## 标记价格、指数价格
 
-Topic: **/futuresContract/markPrice**
+Topic: `/futuresContract/markPrice`
 
 ```json
   //标记价格、指数价格
 {
-    "type":"message",
+    "type": "message",
     "topic": "/futuresContract/markPrice",
     "subject": "mark.index.price",
     "sn": 123123,
     "data": {
-      "symbol": "XBTUSDM", //
-      "granularity": 1000, //粒度
-      "indexPrice": 4000.23, //指数价格
-      "markPrice": 4010.52, //标记价格
-      "ts": 1551770400000
+        "symbol": "XBTUSDM", //合约symbol
+        "granularity": 1000, //粒度
+        "indexPrice": 4000.23, //指数价格
+        "markPrice": 4010.52, //标记价格
+        "ts": 1551770400000
     }
 }
 ```
@@ -2585,22 +2635,26 @@ Topic: **/futuresContract/markPrice**
 
 ## 资金费率
 
-Topic: **/futuresContract/fundingRate:{symbol}**
+Topic: `/futuresContract/fundingRate:{symbol}`
 
 ```json
  //资金费率
 {
-    "type":"message",
+    "type": "message",
     "topic": "/futuresContract/fundingRate:XBTUSDM",
     "subject": "funding.rate",
     "sn": 25997405694459904,
     "data": {
-      "granularity": 60000, //粒度(预测资金费率：1分钟粒度60000; 资金费率: 8小时粒度28800000)
-      "fundingRate": -0.002966, //资金费率
-      "ts": 1551770400000
+        "granularity": 60000, //粒度(预测资金费率：1分钟粒度60000; 资金费率: 8小时粒度28800000)
+        "fundingRate": -0.002966, //资金费率
+        "ts": 1551770400000
     }
 }
 ```
+
+* `granularity`粒度说明：
+    * `60000`（1分钟粒度）
+    * `28800000`（8小时粒度）
 
 <br/>
 <br/>
@@ -2618,48 +2672,51 @@ Topic: **/futuresContract/fundingRate:{symbol}**
 
 ## 订单私有消息
 
-Topic: **/futuresTrade/orders**
+Topic: `/futuresTrade/orders`
 
 ```json
 {
-   "type": "message",
-   "topic": "/futuresTrade/orders",
-   "subject": "orderChange",
-   "channelType": "private",
-   "data": {
-       "orderId": "5cdfc138b21023a909e5ad55", //订单号
-      "tradeId": "123", // 撮合交易id
-      "symbol": "BTCUSDTM", //合约symbol
-      "eventType": "match", //消息类型，取值列表: "open", "match", "filled", "canceled", "update","adl","liquidation"
-      "status": "MATCHING", //订单状态: "MATCHING", "FINISH"
-      "matchSize": "", //成交数量 (当类型为"match"时包含此字段)
-      "matchPrice": "",//成交价格 (当类型为"match"时包含此字段)
-      "orderType": "LIMIT", //订单类型, "MARKET"表示市价单, "LIMIT"表示限价单
-      "side": "BUY", // 订单方向，买或卖
-      "price": "3600", //订单价格
-      "size": "20000", //订单数量
-      "remainSize": "20001", //订单剩余可用于交易的数量
-      "filledSize":"20000", //订单已成交的数量
-      "canceledSize": "0", // canceled消息中，订单减少的数量
-      "clientOid": "5ce24c16b210233c36ee321d", //用户自定义ID
-      "orderTime": , // 下单时间 ms
-      "liquidity": "maker", // 成交方向，取taker一方的买卖方向
-      "ts": // 时间戳 ms,
-      "sn": //序列号 sn
-   }
+    "type": "message",
+    "topic": "/futuresTrade/orders",
+    "subject": "orderChange",
+    "channelType": "private",
+    "data": {
+        "orderId": "5cdfc138b21023a909e5ad55", //订单号
+        "tradeId": "123", // 撮合交易id
+        "symbol": "BTCUSDTM", //合约symbol
+        "eventType": "match", //消息类型，取值列表: "open", "match", "filled", "canceled" , "adl", "liquidation"
+        "status": "MATCHING", //订单状态: "MATCHING", "FINISH"
+        "matchSize": "", //成交数量 (当类型为"match"时包含此字段)
+        "matchPrice": "", //成交价格 (当类型为"match"时包含此字段)
+        "orderType": "LIMIT", //订单类型, "MARKET"表示市价单, "LIMIT"表示限价单
+        "side": "BUY", // 订单方向，买或卖
+        "price": "3600", //订单价格
+        "size": "20000", //订单数量
+        "remainSize": "20001", //订单剩余可用于交易的数量
+        "filledSize": "20000", //订单已成交的数量
+        "canceledSize": "0", // canceled消息中，订单减少的数量
+        "clientOid": "5ce24c16b210233c36ee321d", //用户自定义ID
+        "orderTime": , // 下单时间 ms
+        "liquidity": "maker", // 成交方向，取taker一方的买卖方向
+        "ts": // 时间戳 ms,
+        "sn": //序列号 sn
+    }
 }
 ```
-**订单状态** 
-   "MATCHING": 撮合中，表示订单挂在盘口上
-   "FINISH": 订单完成；
 
-**消息类型**
-   "open": 订单进入买卖盘时发出的消息；  
-   "match": 订单成交时发出的消息；
-   "filled": 订单因成交后状态变为DONE时发出的消息；
-   "canceled": 订单因被取消后状态变为DONE时发出的消息；
-   "adl": adl订单；
-   "liquidation": 强平订单；
+* `eventType`消息类型说明：
+    * `open`（订单进入买卖盘时发出的消息）
+    * `match`（订单成交时发出的消息）
+    * `filled`（订单因成交后状态变为DONE时发出的消息）
+    * `canceled`（订单因被取消后状态变为DONE时发出的消息）
+    * `adl`（adl订单）
+    * `liquidation`（强平订单）
+
+
+* `status`订单状态说明：
+    * `MATCHING`（撮合中，表示订单挂在盘口上）
+    * `FINISH`（订单完成）
+
 <br/>
 <br/>
 <br/>
@@ -2692,29 +2749,40 @@ Topic: **/futuresTrade/orders**
 
 ## 止损单生命周期监听事件
 
-Topic: **/futuresTrade/stopOrder**
+Topic: `/futuresTrade/stopOrder`
 
 ```json
-  {
-       "topic": "/futuresTrade/stopOrder", 
-       "subject": "stopOrder",
-       "data": {
-          "orderId": "5cdfc138b21023a909e5ad55", //订单编号
-          "symbol": "BTCUSDTM", //合约symbol
-          "eventType": "open", // 消息类型: open (止损下单成功), triggered (止损单触发), canceled (止损单取消)
-          "orderType":"STOP", // 订单类型: STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET
-          "side":"BUY", // 订单买卖方向
-          "size":"1000", //数量
-          "orderPrice":"9000", //订单价格
-          "stopPrice":"9100", //止损单触发价格
-          "workingType":"TP", //止损单触发价格类型
-          "triggerSuccess": true, //触发成功标记, 只有triggered类型消息需要
-          "error": "error.createOrder.accountBalanceInsufficient", //错误码, 触发失败时使用
-          "createdAt": 1558074652423, //创建时间
-          "ts":1233123123 //消息时间 ms
-       }
-  }
+{
+    "topic": "/futuresTrade/stopOrder",
+    "subject": "stopOrder",
+    "data": {
+        "orderId": "5cdfc138b21023a909e5ad55", //订单编号
+        "symbol": "BTCUSDTM", //合约symbol
+        "eventType": "open", // 消息类型: open (止损下单成功), triggered (止损单触发), canceled (止损单取消)
+        "orderType": "STOP", // 订单类型: STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET
+        "side": "BUY", // 订单买卖方向
+        "size": "1000", //数量
+        "orderPrice": "9000", //订单价格
+        "stopPrice": "9100", //止损单触发价格
+        "workingType": "TP", //止损单触发价格类型
+        "triggerSuccess": true, //触发成功标记, 只有triggered类型消息需要
+        "error": "error.createOrder.accountBalanceInsufficient", //错误码, 触发失败时使用
+        "createdAt": 1558074652423, //创建时间
+        "ts": 1233123123 //消息时间 ms
+    }
+}
 ```
+* `eventType`说明：
+    * `open`（止损下单成功）
+    * `triggered`（止损单触发）
+    * `canceled`（止损单取消）
+
+* `orderType`说明：
+    * `STOP`（限价止损单）
+    * `STOP_MARKET`（市价止损单）
+    * `TAKE_PROFIT`（限价止盈单）
+    * `TAKE_PROFIT_MARKET`（市价止盈单）
+
 <br/>
 <br/>
 <br/>
@@ -2741,33 +2809,35 @@ Topic: **/futuresTrade/stopOrder**
 
 ## 可用余额变更事件
 
-Topic: **/futuresAccount/accountChange**
+Topic: `/futuresAccount/accountChange`
 
 ```json
 {
-    "type":"message",
-    "topic":"/futuresAccount/accountChange",
-    "channelType":"private",
-    "subject":"futures.availableBalance.change",
-    "data":{
+    "type": "message",
+    "topic": "/futuresAccount/accountChange",
+    "channelType": "private",
+    "subject": "futures.availableBalance.change",
+    "data": {
         "accountEquity": "999922.7850290000",
         "availableBalance": "814058.3002530800",
         "availableTransferBalance": "814058.3002530800",
-        "event":"ORDER_MARGIN_CHANGE_EVENT",
+        "event": "ORDER_MARGIN_CHANGE_EVENT",
         "currency": "USDT",
         "holdBalance": "0.0000000000",
         "orderMargin": "185863.9384800000",
         "positionMargin": "0.5594959200",
         "walletBalance": "999922.7982290000",
         "sn": 11004,
-        "ts":1650426007488
-   }
+        "ts": 1650426007488
+    }
 }
 ```
-**event**
-"ORDER_MARGIN_CHANGE_EVENT":订单保证金变更事件
-"POSITION_CHANGE_EVENT":仓位变更事件
-"TRANSFER_EVENT":"划转事件"
+
+* `event`说明：
+    * `ORDER_MARGIN_CHANGE_EVENT`（订单保证金变更事件）
+    * `POSITION_CHANGE_EVENT`（仓位变更事件）
+    * `TRANSFER_EVENT`（划转事件）
+
 
 <br/>
 <br/>
@@ -2786,45 +2856,52 @@ Topic: **/futuresAccount/accountChange**
 ## 仓位变化
 ### 仓位操作引起的仓位变化
 
-Topic: **/futuresPosition/position**
+Topic: `futuresPosition/position`
 
 ```json
-  {
-    "type":"message",
-    "topic":"/futuresPosition/position",
-    "channelType":"private",
-    "subject":"position.change",
-    "sn":45300,
-    "data":{
-        "autoDeposit":false,
-        "changeType":"POSITION_CHANGE",
-        "entryPrice":14.431,
-        "entryValue":-17.3178,
-        "leverage":5,
-        "liquidationPrice":17.161,
-        "liquidationValue":-20.59413818,
-        "maintenanceMargin":0.173178,
-        "maintenanceMarginRate":0.01,
-        "margin":3.44951618,
-        "marginType":"ISOLATED",
-        "markPrice":14.15,
-        "openTime":1650424933902,
-        "qty":-12,
-        "riskRate":0.0458,
-        "settleCurrency":"USDT",
-        "side":"BOTH",
-        "snapshotId":6558,
-        "symbol":"LINKUSDTM",
-        "totalMargin":3.78731618,
-        "unrealisedPnl":0.3378,
-        "sn":12323,
-        "ts":1650424935025
+{
+    "type": "message",
+    "topic": "/futuresPosition/position",
+    "channelType": "private",
+    "subject": "position.change",
+    "sn": 45300,
+    "data": {
+        "autoDeposit": false,
+        "changeType": "POSITION_CHANGE",
+        "entryPrice": 14.431,
+        "entryValue": -17.3178,
+        "leverage": 5,
+        "liquidationPrice": 17.161,
+        "liquidationValue": -20.59413818,
+        "maintenanceMargin": 0.173178,
+        "maintenanceMarginRate": 0.01,
+        "margin": 3.44951618,
+        "marginType": "ISOLATED",
+        "markPrice": 14.15,
+        "openTime": 1650424933902,
+        "qty": -12,
+        "riskRate": 0.0458,
+        "settleCurrency": "USDT",
+        "side": "BOTH",
+        "snapshotId": 6558,
+        "symbol": "LINKUSDTM",
+        "totalMargin": 3.78731618,
+        "unrealisedPnl": 0.3378,
+        "sn": 12323,
+        "ts": 1650424935025
     }
 }
 ```
-**changeType**
-MARGIN_CHANGE（增减保证金仓位变更）,POSITION_CHANGE（用户成交引起的仓位数量变更）,LIQUIDATION（强平仓位变更）,ADL（自动减仓仓位变更）,LEVERAGE_CHANGE（全局杠杆仓位变更),
-FUNDING_SETTLE（资金费用结算仓位变更）,AUTO_DEPOSIT（自动追加保证金状态仓位变更）,SETTLEMENT（交割仓位变更）
+
+* `changeType`说明：
+    * `MARGIN_CHANGE`（增减保证金仓位变更）
+    * `POSITION_CHANGE`（用户成交引起的仓位数量变更）
+    * `LIQUIDATION`（强平仓位变更）
+    * `ADL`（自动减仓仓位变更）
+    * `LEVERAGE_CHANGE`（全局杠杆仓位变更)
+    * `FUNDING_SETTLE`（资金费用结算仓位变更）
+    * `AUTO_DEPOSIT`（自动追加保证金状态仓位变更）
+    * `SETTLEMENT`（交割仓位变更）
 
 <br/>
 <br/>
