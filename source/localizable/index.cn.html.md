@@ -238,7 +238,7 @@ USDT结算合约上线, 交易所从只支持一个币种 XBT, 变为同时支�
 
 目前有以下3种限频规则：
 
-* `code: 1015`是指从该IP的请求过多，触发了cloudflare限制, 触发后限制时间`30s`。建议不同(子)账号使用不过的IP去请求，避免相互影响。
+* `code: 1015`是指从该IP的请求过多，触发了cloudflare限制, 触发后限制时间`30s`。建议不同(子)账号使用不同的IP去请求，避免相互影响。
 * `{"code":"200002","msg":"Too many requests in a short period of time, please retry later"}`是指账号特定接口超过请求限制, 触发后限制时间为`10s`。您可以使用多个子账号来避免这个问题。
 * `{"code":"429000","msg":"Too Many Requests"}`是指服务器短时间收到过多请求，由于服务器过载保护拒绝了此次请求。您可以直接重试请求。
 
@@ -721,16 +721,16 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
     - `SUCCESS`-成功
     - `FAILURE`-失败
 </br></br>
-保证金模式(`marginType`):
+* 保证金模式(`marginType`):
     - `ISOLATED`-逐仓
     - `CROSSED`-全仓
 </br></br>
-仓位方向(`side`):
+* 仓位方向(`side`):
     - `BOTH`-单向持仓
     - `LONG`-做多方向
     - `SHORT`-做空方向
 </br></br>
-平仓类型(`type`):
+* 平仓类型(`type`):
     - `CLOSE_LONG`-手动平多
     - `CLOSE_SHORT`-手动平多
     - `LIQUID_LONG`-强制平多
@@ -814,7 +814,7 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 ### HTTP请求
 `GET /api/v2/user-config/leverages`
 ### 参数
-无
+`无`
 ### 返回值
 属性 | 含义 |
 --------- | -----------|
@@ -897,8 +897,6 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 ```
 ### HTTP请求
 `GET /api/v2/account-overview`
-### 请求示例
-GET /api/v2/account-overview?currency=BTC
 ### API权限
 该接口需要`通用权限`
 ### 频率限制
@@ -958,8 +956,6 @@ availableTransferBalance|可转金额
 ```
 ### HTTP请求
 `GET /api/v2/transaction-history`
-### 请求示例
-GET /api/v2/transaction-history?currency=USDT
 #### API权限
 该接口需要`通用权限`
 #### 频率限制
@@ -1035,8 +1031,6 @@ remark|说明
 ```
 ### HTTP请求
 `POST /api/v2/transfer-out`
-### 请求示例
-POST /api/v2/transfer-out
 ### API权限
 该接口需要`交易权限`
 ### 频率限制
@@ -1107,8 +1101,6 @@ updatedAt|更新时间
 ```
 ### HTTP请求
 `GET /api/v2/transfer-list`
-### 请求示例
-GET /api/v2/transfer-list
 ### API权限
 该接口需要`通用权限`
 ### 频率限制
@@ -1153,8 +1145,6 @@ remark|付款账户备注
 ```
 ### HTTP请求
 `DELETE /api/v2/cancel/transfer-out`
-### 请求示例
-DELETE /api/v2/cancel/transfer-out
 ### API权限
 该接口需要`通用权限`
 ### 频率限制
@@ -1177,8 +1167,7 @@ applyId|String|YES|转出申请id
 ```
 ### HTTP请求
 `POST /api/v2/transfer-in`
-### 请求示例
-POST /api/v2/transfer-in
+
 ### API权限
 该接口需要`交易权限`
 ### 频率限制
@@ -1464,7 +1453,7 @@ orderIds | 成功撤掉的订单id
 ### HTTP请求
 `GET /api/v2/orders/all-active`
 ### 参数
-无
+`无`
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1657,7 +1646,7 @@ adlPercentile | adl排名信息 |
 ### HTTP请求
 `GET /api/v2/all-position`
 ### 参数
-无
+`无`
 ### 返回值
 属性  | 含义 |  
 --------- | -----------|
@@ -1796,7 +1785,7 @@ closePrice | 平仓价格 |
 ### HTTP请求
 `GET /api/v2/contracts/active`
 ### 参数
-无
+`无`
 ### 返回值
 属性  | 含义 |  
 --------- | -----------|
