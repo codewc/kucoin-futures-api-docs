@@ -668,21 +668,20 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
     - `TAKE_PROFIT` 限价止盈
     - `STOP_MARKET` 市价止损
     - `TAKE_PROFIT_MARKET`  市价止盈
-    - **TRAILING_STOP_MARKET ?**TODO:
 </br></br>
 * 下单类型(`placeType`):
-    - **DEFAULT	？**TODO
-    - **OTOCO	？**TODO
+    - `DEFAULT`	默认
+    - `OTOCO` 订单止盈止损
     - `STEP_REDUCE_POSITION`	阶梯减仓
     - `LIQUIDATION_TAKE_OVER`	强平接管
     - `ADL_TRIGGER`	ADL触发用户
     - `ADL_LUCKY`	ADL幸运用户
 </br></br>
-* 触发价格方式(workingType):
+* 触发价格方式(`workingType`):
     - `MP`	标记价格
     - `TP`	最新成交价
 </br></br>
-* 有效方式(timeInForce):
+* 有效方式(`timeInForce`):
     - `GTC`: 用户主动取消才过期
     - `IOC`:立即成交可成交的部分，然后取消剩余部分，不进入买卖盘；
     - `FOK`：如果下单不能全部成交，则取消；
@@ -1164,7 +1163,8 @@ DELETE /api/v2/cancel/transfer-out
 参数|数据类型|是否必需|含义
 ---|---|---|---
 applyId|String|YES|转出申请id
-
+### 返回值
+当`code`为`200`代表成功，其他代表失败
 
 ## 资金转入合约账户
 ``` json
@@ -1189,7 +1189,8 @@ POST /api/v2/transfer-in
 amount|Number|YES|交易金额
 currency|String|YES|币种
 payAccountType|String|YES|付款账户类型：只能是`MAIN`-储蓄账户，`TRADE`-交易账户
-
+### 返回值
+当`code`为`200`代表成功，其他代表失败
 
 
 
@@ -1220,7 +1221,7 @@ payAccountType|String|YES|付款账户类型：只能是`MAIN`-储蓄账户，`T
  symbol       | STRING   | YES      | 交易对                                                       
  side         | ENUM     | YES      | 买卖方向 `SELL`, `BUY`                                           
  price        | DECIMAL  | NO       | 价格                                                         
- type         | ENUM     | YES      | 订单类型 `LIMIT`, `MARKET`, `STOP`, `TAKE_PROFIT`, `STOP_MARKET`, `TAKE_PROFIT_MARKET`, `TRAILING_STOP_MARKET` 
+ type         | ENUM     | YES      | 订单类型 `LIMIT`, `MARKET`, `STOP`, `TAKE_PROFIT`, `STOP_MARKET`, `TAKE_PROFIT_MARKET`
  size         | INT      | NO       | 下单数量,使用`closeOrder`不支持此参数                          
  clientOid    | STRING   | NO       | 唯一的订单ID，可用于识别订单。如：UUID,只能包含数字、字母、下划线（_）或 分隔线（-） 
  reduceOnly   | BOOLEAN  | NO       | [可选] 只减仓标记, 默认值是 `false` 。值为`true`时，需要设置平仓数量 
@@ -2531,6 +2532,10 @@ Topic: `/futuresMarket/ticker:{symbol}`
 <br/>
 <br/>
 <br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 ## Level 2 市场行情
 
@@ -2664,7 +2669,7 @@ Topic: `/futuresMarket/level2Depth5:{symbol}`
          ["9984", "10"]
   
        ],
-       "ts": 1650447324950       // 时间毫秒
+       "ts": 1650447324950 //时间毫秒
     }
  }
 ```
@@ -2746,7 +2751,8 @@ Topic: `/futuresMarket/level2Depth50:{symbol}`
 <br/>
 <br/>
 <br/>
-
+<br/>
+<br/>
 
 
 ## 标记价格、指数价格
@@ -2765,10 +2771,16 @@ Topic: `/futuresContract/markPrice`
         "granularity": 1000, //粒度
         "indexPrice": 4000.23, //指数价格
         "markPrice": 4010.52, //标记价格
-        "ts": 1551770400000
+        "ts": 1551770400000 //时间毫秒
     }
 }
 ```
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 <br/>
 <br/>
 <br/>
@@ -2861,21 +2873,6 @@ Topic: `/futuresTrade/orders`
 * `status`订单状态说明：
     * `MATCHING`（撮合中，表示订单挂在盘口上）
     * `FINISH`（订单完成）
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <br/>
 <br/>
@@ -2921,7 +2918,7 @@ Topic: `/futuresTrade/stopOrder`
     * `open`（止损下单成功）
     * `triggered`（止损单触发）
     * `canceled`（止损单取消）
-
+<br/><br/>
 * `orderType`说明：
     * `STOP`（限价止损单）
     * `STOP_MARKET`（市价止损单）
@@ -2963,17 +2960,17 @@ Topic: `/futuresAccount/accountChange`
     "channelType": "private",
     "subject": "futures.availableBalance.change",
     "data": {
-        "accountEquity": "999922.7850290000",
-        "availableBalance": "814058.3002530800",
-        "availableTransferBalance": "814058.3002530800",
-        "event": "ORDER_MARGIN_CHANGE_EVENT",
-        "currency": "USDT",
-        "holdBalance": "0.0000000000",
-        "orderMargin": "185863.9384800000",
-        "positionMargin": "0.5594959200",
-        "walletBalance": "999922.7982290000",
-        "sn": 11004,
-        "ts": 1650426007488
+        "accountEquity": "999922.7850290000",//合约账户总权益
+        "availableBalance": "814058.3002530800",//可用余额
+        "availableTransferBalance": "814058.3002530800",//可转金额
+        "event": "ORDER_MARGIN_CHANGE_EVENT",//消息事件
+        "currency": "USDT",//转出冻结
+        "holdBalance": "0.0000000000",//转出冻结
+        "orderMargin": "185863.9384800000",//订单保证金
+        "positionMargin": "0.5594959200",//仓位保证金
+        "walletBalance": "999922.7982290000",//钱包余额
+        "sn": 11004,//序列号
+        "ts": 1650426007488//消息时间 ms
     }
 }
 ```
@@ -3011,29 +3008,29 @@ Topic: `futuresPosition/position`
     "subject": "position.change",
     "sn": 45300,
     "data": {
-        "autoDeposit": false,
-        "changeType": "POSITION_CHANGE",
-        "entryPrice": 14.431,
-        "entryValue": -17.3178,
-        "leverage": 5,
-        "liquidationPrice": 17.161,
+        "autoDeposit": false,//是否自动追加保证金
+        "changeType": "POSITION_CHANGE",//仓位变化类型
+        "entryPrice": 14.431,//平均开仓价格
+        "entryValue": -17.3178,//开仓价值
+        "leverage": 5,//全局杠杆
+        "liquidationPrice": 17.161,//强平价格
         "liquidationValue": -20.59413818,
-        "maintenanceMargin": 0.173178,
-        "maintenanceMarginRate": 0.01,
-        "margin": 3.44951618,
-        "marginType": "ISOLATED",
-        "markPrice": 14.15,
-        "openTime": 1650424933902,
-        "qty": -12,
-        "riskRate": 0.0458,
-        "settleCurrency": "USDT",
-        "side": "BOTH",
+        "maintenanceMargin": 0.173178,//维持保证金
+        "maintenanceMarginRate": 0.01,//仓位维持保证金率
+        "margin": 3.44951618,//仓位保证金
+        "marginType": "ISOLATED",//保证金模式
+        "markPrice": 14.15,//标记价格
+        "openTime": 1650424933902,//开仓时间
+        "qty": -12,//仓位数量
+        "riskRate": 0.0458,//仓位风险率（<1，数值越大，风险越高）
+        "settleCurrency": "USDT",//合约结算币种
+        "side": "BOTH",//仓位方向
         "snapshotId": 6558,
-        "symbol": "LINKUSDTM",
-        "totalMargin": 3.78731618,
-        "unrealisedPnl": 0.3378,
-        "sn": 12323,
-        "ts": 1650424935025
+        "symbol": "LINKUSDTM",//合约symbol
+        "totalMargin": 3.78731618,//仓位总保证金（包含了未实现盈亏）
+        "unrealisedPnl": 0.3378,//未实现盈亏
+        "sn": 12323,//序列号
+        "ts": 1650424935025//消息时间 ms
     }
 }
 ```
