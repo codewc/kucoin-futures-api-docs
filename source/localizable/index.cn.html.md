@@ -764,6 +764,8 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
 ```
 ### HTTP请求
 `POST /api/v2/user-config/change-auto-deposit`
+### API权限
+该接口需要`交易权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -782,6 +784,8 @@ autoDeposit | Boolean | 是 | 是否开启自动追加保证金（设置为`true
 ```
 ### HTTP请求
 `GET /api/v2/user-config/leverage`
+### API权限
+该接口需要`通用权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -813,6 +817,8 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 ```
 ### HTTP请求
 `GET /api/v2/user-config/leverages`
+### API权限
+该接口需要`通用权限`
 ### 参数
 `无`
 ### 返回值
@@ -835,6 +841,8 @@ maxRiskLimit | 该杠杆下持仓最大限额 |
 ```
 ### HTTP请求
 `POST /api/v2/user-config/adjust-leverage`
+### API权限
+该接口需要`交易权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1167,7 +1175,6 @@ applyId|String|YES|转出申请id
 ```
 ### HTTP请求
 `POST /api/v2/transfer-in`
-
 ### API权限
 该接口需要`交易权限`
 ### 频率限制
@@ -1204,6 +1211,8 @@ payAccountType|String|YES|付款账户类型：只能是`MAIN`-储蓄账户，`T
 ```
 ### HTTP请求
 `POST /api/v2/order`
+### API权限
+该接口需要`交易权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
@@ -1266,9 +1275,9 @@ orderId | 订单id
 
 ### HTTP请求
 `DELETE /api/v2/order`
-
+### API权限
+该接口需要`交易权限`
 ### 参数
-
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
 symbol | STRING | YES | 合约symbol
@@ -1299,6 +1308,8 @@ clientOid | STRING | NO | 用户自定义orderId
 ```
 ### HTTP请求
 `DELETE /api/v2/orders`
+### API权限
+该接口需要`交易权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
@@ -1341,6 +1352,8 @@ orderIds | 成功撤掉的订单id
 ```
 ### HTTP请求
 `GET /api/v2/orders/historical-trades`
+### API权限
+该接口需要`通用权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
@@ -1374,6 +1387,8 @@ orderIds | 成功撤掉的订单id
 ## 查询单个订单详情
 ### HTTP请求
 `GET /api/v2/order/detail`
+### API权限
+该接口需要`通用权限`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | -- |
@@ -1413,6 +1428,8 @@ orderIds | 成功撤掉的订单id
 ## 查询活跃订单
 ### HTTP请求
 `GET /api/v2/orders/active`
+### API权限
+该接口需要`通用权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 
 --------- | ------- | -----------| -----------
@@ -1452,6 +1469,8 @@ orderIds | 成功撤掉的订单id
 ## 查询全部活跃订单
 ### HTTP请求
 `GET /api/v2/orders/all-active`
+### API权限
+该接口需要`通用权限`
 ### 参数
 `无`
 ### 返回值
@@ -1524,6 +1543,8 @@ orderIds | 成功撤掉的订单id
 ```
 ### HTTP请求
 `GET /api/v2/orders/history`
+### API权限
+该接口需要`通用权限`
 ### 参数
 | 参数     | 数据类型 | 含义 |
 | :------- | -------- | ---------- |
@@ -1592,6 +1613,8 @@ orderIds | 成功撤掉的订单id
 ```
 ### HTTP请求
 `GET /api/v2/symbol-position`
+### API权限
+该接口需要`通用权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1645,6 +1668,8 @@ adlPercentile | adl排名信息 |
 ```
 ### HTTP请求
 `GET /api/v2/all-position`
+### API权限
+该接口需要`通用权限`
 ### 参数
 `无`
 ### 返回值
@@ -1676,6 +1701,8 @@ adlPercentile | adl排名信息 |
 ```
 ### HTTP请求
 `POST /api/v2/change-margin`
+### API权限
+该接口需要`交易权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -1709,6 +1736,8 @@ data | `true` 表示增减保证金成功 |
 ```
 ### HTTP请求
 `GET /api/v2/close-pnl-his`
+### API权限
+该接口需要`通用权限`
 ### 参数
 参数 | 数据类型 | 是否必须 | 含义 |  
 --------- | ------- | -----------| -----------|
@@ -2488,9 +2517,6 @@ ID用于标识请求和ack的唯一字符串。
     "response": true                              
   }
 ```
-
-Topic: `/futuresMarket/ticker:{symbol}`
-
 ```json
 {
     "subject": "ticker",
@@ -2505,6 +2531,11 @@ Topic: `/futuresMarket/ticker:{symbol}`
     }
 }
 ```
+
+Topic: `/futuresMarket/ticker:{symbol}`
+
+* 推送频率: `实时推送`
+
 订阅此topic，可获取指定交易对的最佳买一和卖一价（BBO）的数据推送。
 <br/>
 <br/>
@@ -2557,6 +2588,8 @@ Topic: `/futuresMarket/ticker:{symbol}`
 
 Topic：`/futuresMarket/level2:{symbol}`
 
+* 推送频率: `100ms`一次
+
 订阅此topic，获取Level 2买卖盘数据，订阅成功后，Websocket系统将向您推送增量数据的消息。
 
 
@@ -2607,6 +2640,8 @@ Topic：`/futuresMarket/level2:{symbol}`
 
 Topic: `/futuresMarket/execution:{symbol}`
 
+* 推送频率: `实时推送`
+
 每撮合一笔订单，系统就会推送此订单成交记录消息
 
 
@@ -2631,11 +2666,6 @@ Topic: `/futuresMarket/execution:{symbol}`
 
 
 ## level2的5档全量数据推送频道 
-
-Topic: `/futuresMarket/level2Depth5:{symbol}`
-
-* 推送频率: `100ms`一次
-
 ```json
 {
    "type": "message",
@@ -2663,6 +2693,9 @@ Topic: `/futuresMarket/level2Depth5:{symbol}`
  }
 ```
 
+Topic: `/futuresMarket/level2Depth5:{symbol}`
+
+* 推送频率: `100ms`一次
 
 <br/>
 <br/>
@@ -2690,11 +2723,6 @@ Topic: `/futuresMarket/level2Depth5:{symbol}`
 
 
 ## level2的50档全量数据推送频道
-
-Topic: `/futuresMarket/level2Depth50:{symbol}`
-
-* 推送频率: `100ms`一次
-
 ```json
 {
     "type": "message",
@@ -2720,6 +2748,10 @@ Topic: `/futuresMarket/level2Depth50:{symbol}`
     }
 }
 ```
+
+Topic: `/futuresMarket/level2Depth50:{symbol}`
+
+* 推送频率: `100ms`一次
 <br/>
 <br/>
 <br/>
@@ -2745,9 +2777,6 @@ Topic: `/futuresMarket/level2Depth50:{symbol}`
 
 
 ## 标记价格、指数价格
-
-Topic: `/futuresContract/markPrice`
-
 ```json
   //标记价格、指数价格
 {
@@ -2764,6 +2793,12 @@ Topic: `/futuresContract/markPrice`
     }
 }
 ```
+
+Topic: `/futuresContract/markPrice`
+
+* 推送频率: `1s`一次
+
+
 <br/>
 <br/>
 <br/>
@@ -2781,9 +2816,6 @@ Topic: `/futuresContract/markPrice`
 
 
 ## 资金费率
-
-Topic: `/futuresContract/fundingRate:{symbol}`
-
 ```json
  //资金费率
 {
@@ -2799,6 +2831,10 @@ Topic: `/futuresContract/fundingRate:{symbol}`
 }
 ```
 
+Topic: `/futuresContract/fundingRate:{symbol}`
+
+* 推送频率: `8h`一次
+<br/><br/>
 * `granularity`粒度说明：
     * `60000`（1分钟粒度）
     * `28800000`（8小时粒度）
@@ -2818,9 +2854,6 @@ Topic: `/futuresContract/fundingRate:{symbol}`
 # 私有消息
 
 ## 订单私有消息
-
-Topic: `/futuresTrade/orders`
-
 ```json
 {
     "type": "message",
@@ -2851,6 +2884,10 @@ Topic: `/futuresTrade/orders`
 }
 ```
 
+Topic: `/futuresTrade/orders`
+
+* 推送频率: `实时推送`
+<br/><br/>
 * `eventType`消息类型说明：
     * `open`（订单进入买卖盘时发出的消息）
     * `match`（订单成交时发出的消息）
@@ -2879,9 +2916,6 @@ Topic: `/futuresTrade/orders`
 <br/>
 
 ## 止损单生命周期监听事件
-
-Topic: `/futuresTrade/stopOrder`
-
 ```json
 {
     "topic": "/futuresTrade/stopOrder",
@@ -2903,6 +2937,11 @@ Topic: `/futuresTrade/stopOrder`
     }
 }
 ```
+
+Topic: `/futuresTrade/stopOrder`
+
+* 推送频率: `实时推送`
+<br/><br/>
 * `eventType`说明：
     * `open`（止损下单成功）
     * `triggered`（止损单触发）
@@ -2941,6 +2980,8 @@ Topic: `/futuresTrade/stopOrder`
 ## 可用余额变更事件
 
 Topic: `/futuresAccount/accountChange`
+
+* 推送频率: `实时推送`
 
 ```json
 {
@@ -2986,9 +3027,6 @@ Topic: `/futuresAccount/accountChange`
 
 ## 仓位变化
 ### 仓位操作引起的仓位变化
-
-Topic: `futuresPosition/position`
-
 ```json
 {
     "type": "message",
@@ -3024,6 +3062,10 @@ Topic: `futuresPosition/position`
 }
 ```
 
+Topic: `futuresPosition/position`
+
+* 推送频率: `实时推送`
+<br/><br/>
 * `changeType`说明：
     * `MARGIN_CHANGE`（增减保证金仓位变更）
     * `POSITION_CHANGE`（用户成交引起的仓位数量变更）
