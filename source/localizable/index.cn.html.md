@@ -2189,13 +2189,13 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 ## 查询合约标记价格
 ```json
 {
-"code": "200000",
-"data": {
-"symbol": "BTCUSDTM",
-"timePoint": "1651202804000",
-"value": "39504.65",
-"indexPrice": "39520.09"
-}
+    "code": "200000",
+    "data": {
+        "symbol": "BTCUSDTM",
+        "timePoint": "1651202804000",
+        "value": "39504.65",
+        "indexPrice": "39520.09"
+    }
 }
 ```
 ### HTTP请求
