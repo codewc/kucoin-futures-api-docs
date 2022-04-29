@@ -3,14 +3,14 @@
 欢迎使用KuCoin合约(KuCoin Futures)开发者文档。 此文档概述了交易功能、市场行情和其他应用开发接口。
 
 
-KuCoin Futures API分为两部分：**REST API 和 Websocket 实时数据流**
+KuCoin Futures API分为两部分：`REST API` 和 `Websocket`实时数据流
 
- -  REST API 包含三个类别：**用户（私有）、交易（私有）、市场数据（公共）**
- -  Websocket包含两类：**公共频道和私人频道**
+ -  REST API 包含三个类别：`用户（私有）`、`交易（私有）`、`市场数据（公共）`
+ -  Websocket包含两类：`公共频道`和`私人频道`
 
 ## 更新预告
 
-**为了进一步提升API安全性，KuCoin已经升级到了V2版本的API-KEY，验签逻辑也发生了一些变化，建议到[API管理页面](https://futures.kucoin.com/api)添加并更换到新的API-KEY。KuCoin将继续支持使用老的API-KEY到2021年05月01日。请查看“消息签名”，了解更多详情**
+<!-- **为了进一步提升API安全性，KuCoin已经升级到了V2版本的API-KEY，验签逻辑也发生了一些变化，建议到[API管理页面](https://futures.kucoin.com/api)添加并更换到新的API-KEY。KuCoin将继续支持使用老的API-KEY到2021年05月01日。请查看“消息签名”，了解更多详情** -->
 
 #### 2022.03.24
 * 废弃了[GET /api/v1/level2/message/query](#level-2-3)接口
@@ -200,33 +200,29 @@ USDT结算合约上线, 交易所从只支持一个币种 XBT, 变为同时支�
 ####2020.03.05
 * 修复 accountEquity 和 marginBalance 含义，修复后 accountEquity为账户总权益，= unrealisedPNL + marginBalance;
 
-## 客户端开发库
+## 客户端开发库（SDK）
 
 使用客户端开发库可快速集成到KuCoin Futures API。
 
-**官方软件开发工具包（SDK）**
-
-- [PHP SDK](https://github.com/Kucoin/kucoin-futures-php-sdk)
-
-- [Java SDK](https://github.com/Kucoin/kucoin-futures-java-sdk)
-
-- [Node.js SDK](https://github.com/Kucoin/kucoin-futures-node-sdk)
-
-- [Python SDK](https://github.com/Kucoin/kucoin-futures-python-sdk)
-
-- [Go SDK](https://github.com/Kucoin/kucoin-futures-go-sdk)
-
+* 官方软件开发工具包（SDK）
+    - [PHP SDK](https://github.com/Kucoin/kucoin-futures-php-sdk)
+    - [Java SDK](https://github.com/Kucoin/kucoin-futures-java-sdk)
+    - [Node.js SDK](https://github.com/Kucoin/kucoin-futures-node-sdk)
+    - [Python SDK](https://github.com/Kucoin/kucoin-futures-python-sdk)
+    - [Go SDK](https://github.com/Kucoin/kucoin-futures-go-sdk)
   
 
 ## 沙盒测试环境
-沙盒是测试环境，用于测试API连接和Web交易，并提供交易的所有功能。在沙盒中，您可以使用虚假资金来测试交易功能。
-沙盒环境中的登录会话和API密钥与生产环境完全分离。您可以使用沙盒环境中的Web界面来创建API密钥。
+沙盒是测试环境，用于测试`API`连接和`Web`交易，并提供交易的所有功能。在沙盒中，您可以使用`虚假资金`来测试交易功能。
+沙盒环境中的登录会话和API密钥与生产环境完全`分离`。您需要在Web登录沙盒网址`https://sandbox-futures.kucoin.com`去创建`API`密钥。
+<aside class="notice">
+    在沙盒环境中注册后，您将收到系统在您的帐户中自动充值的一定数量的`虚假资金（XBT）`。如果您想交易，请将资产从`储蓄账户`转移到`交易账户`。这些资金仅用于测试目的，不能提现。
+</aside>
 
-**注意:**在沙盒环境中注册后，您将收到系统在您的帐户中自动充值的一定数量的测试资金（XBT）。如果您想交易，请将资产从储蓄账户转移到交易账户。这些资金仅用于测试目的，不能提现。
-
-**用于API测试的沙盒URL：**
-* 网址：https://sandbox-futures.kucoin.com 
-* REST API 连接地址: **https://api-sandbox-futures.kucoin.com** (https://sandbox-api.kumex.com has been Deprecated)
+沙盒REST API地址: `https://api-sandbox-futures.kucoin.com` 
+<aside class="warning">
+    旧的沙盒REST API地址`https://sandbox-api.kumex.com`已经废弃
+</aside>
 
 
 ## 请求频率限制
@@ -245,39 +241,39 @@ USDT结算合约上线, 交易所从只支持一个币种 XBT, 变为同时支�
 ### WEBSOCKET
 
 **连接数量**
-- 每个用户ID同时建立的连接数：**≤ 50个**
+- 每个用户ID同时建立的连接数：≤ `50`个
 
 **连接次数**
-
- - 连接请求次数限制：**每分钟 30次 请求**
+ - 连接请求次数限制：≤ `30`次/分钟
 
 **上行消息条数** 
-
- - 向服务器发送指令条数限制：**每10秒 100条**
+ - 向服务器发送指令条数限制：≤  `100`条/`10`秒
 
 **订阅topic数量** 
-
- - 每个连接最大可订阅topic数量限制：**100个topics**
+ - 每个连接最大可订阅topic数量限制：≤`100`个topics
 
 ## 做市激励计划
 KuCoin Futures为专业做市商提供做市激励计划。 参与该计划，可以获得以下激励：
 
  - 做市商返佣
  - 每月嘉奖前十名表现优良的做市团队，高额回馈最佳做市商
- - 直接市场接入（提供private link接入）
+ - 直接市场接入（提供`private link`接入）
 
-具有良好做市策略和大交易量的用户欢迎参与此长期做市激励计划。如果您的账户在过去30天内的交易量超过5000 BTC，请提供以下信息以发送电子邮件至**mm@kucoin.com**，邮件主题为“Futures Market Maker Application”：
+具有良好做市策略和大交易量的用户欢迎参与此长期做市激励计划。如果您的账户在过去30天内的交易量超过5000 BTC，请提供以下信息以发送电子邮件至`mm@kucoin.com`，邮件主题为`“Futures Market Maker Application”`：
 
  - 提供平台帐户（需要电子邮件，无需推荐关系）
- - 过去30天内在任何交易所交易的交易量证明或VIP级别的证明
+ - 过去`30`天内在任何交易所交易的交易量证明或VIP级别的证明
  - 请简要说明做市的方法（不需要详细说明）以及估算做市订单量的百分比。
 
 ## VIP快速通道
-具有良好做市策略和大交易量的用户欢迎参与长期做市商计划。 如果您的帐户资产大于10BTC，请提供以下信息以发送电子邮件至：**vip_futures@kucoin.com**进行做市商申请;
+具有良好做市策略和大交易量的用户欢迎参与长期做市商计划。 如果您的帐户资产大于`10`BTC，请提供以下信息以发送电子邮件至：`vip_futures@kucoin.com`进行做市商申请;
 
  - 提供平台帐户（需要电子邮件，无需推荐关系）;
- - 提供其他交易平台做市商交易量的截图（例如30天内的交易量，或VIP级别等）; 
+ - 提供其他交易平台做市商交易量的截图（例如`30`天内的交易量，或VIP级别等）; 
  - 请简要说明做市的方法，不需要详细说明；
+
+## 数据中心
+KuCoin 数据中心位于AWS日本东京 (ap-northeast-1a) 地区。
 
 ---
 # REST API
@@ -287,40 +283,39 @@ KuCoin Futures为专业做市商提供做市激励计划。 参与该计划，�
 
 REST API对用户、交易及市场数据均提供了接口。
 
-基本URL： **https://api-futures.kucoin.com** (**https://api.kumex.com** 已过期不推荐使用)
-
+基本URL：`https://api-futures.kucoin.com`
+请求URL由`基本URL`和指定`接口端点`组成。
+<aside class="warning">`https://api.kumex.com`已过期不推荐使用</aside>
 <aside class="notice">为了遵守当地法律要求，使用中国IP的用户不允许访问以上URL。</aside>
 
-请求URL由基本URL和指定接口端点组成。
 
 
 ## 接口端点
 
-每个接口都提供了对应的端点，可在**HTTP请求**模块下获取。
+每个接口都提供了对应的端点，可在`HTTP`请求模块下获取。
 
 
-对于**GET请求**，只需将请求参数拼接在请求路径后面。
+对于`GET`请求，只需将请求参数拼接在请求路径后面。
 
-例如：对于“仓位” 接口，其默认端点为/api/v1/position。请求“合约”参数（XBTUSDM）时，该端点将变为：**/api/v1/position?symbol=XBTUSDM**。因此，您最终请求的URL应为：**https://api-futures.kucoin.com/api/v1/position?symbol=XBTUSDM**。
+例如：对于“仓位” 接口，其默认端点为`/api/v1/position`。请求“合约”参数（`XBTUSDM`）时，该端点将变为：`/api/v1/position?symbol=XBTUSDM`。因此，您最终请求的URL应为：`https://api-futures.kucoin.com/api/v1/position?symbol=XBTUSDM`。
 
 ## 请求
-所有的请求和响应的内容类型都是application/json。  
+所有的请求和响应的内容类型都是`application/json`。  
 
 
-除非另行说明，所有的时间戳参数均以Unix时间戳毫秒计算。如：**1544657947759**
+除非另行说明，所有的时间戳参数均以Unix时间戳毫秒计算。如：`1544657947759`
 
 ## 参数
 
-对于**GET**和**DELETE**请求，需将参数拼接在请求URL中（如：**/api/v1/position?symbol=XBTUSDM**）。
+对于`GET`和`DELETE`请求，需将参数拼接在请求URL中（如：`/api/v1/position?symbol=XBTUSDM`）。
 
-对于**POST**和**PUT**请求，需将参数以JSON格式拼接在请求主体中（如： {"side":"buy"}）。
-
-**注意：不要在JSON字符串中添加空格。**
+对于`POST`和`PUT`请求，需将参数以JSON格式拼接在请求主体中（如：`{"side":"buy"}`）。
+<aside class="notice">不要在JSON字符串中添加空格</aside>
 
 
 ### 错误返回
 
-系统会返回HTTP错误代码或系统错误代码。您可根据返回的参数消息排查错误原因。
+系统会返回`HTTP错误代码`或`系统错误代码`。您可根据返回的参数消息排查错误原因。
 
 
 #### HTTP错误码
@@ -393,13 +388,13 @@ REST API对用户、交易及市场数据均提供了接口。
 429000 | Too Many Requests -- 超频错误:基于接口的全站流量限制，可以直接重试请求
 500000 | Internal Server Error -- 服务器出错，请稍后再试
 
-系统返回的HTTP状态码不是200时，接口返回会显示错误码。调用成功时，系统将返回code和data字段；调用失败时，系统将返回code和msg字段。您可根据返回的参数消息排查错误。
+系统返回的*HTTP状态码*不是`200`时，接口返回会显示错误码。调用成功时，系统将返回`code`和`data`字段；调用失败时，系统将返回`code`和`msg`字段。您可根据返回的参数消息排查错误。
 
 
 
 ### 成功返回
 
-当系统返回**HTTP状态码200和系统代码200000**时，表示响应成功，返回结果如下：
+当系统返回*HTTP状态码*`200`和*系统代码*`200000`时，表示响应成功，返回结果如下：
 
 ```json
   {
@@ -451,22 +446,22 @@ HasMore分页器采用滑动窗口机制，通过在一个数据流上滑动固�
 | maxCount  | int     | 每次滑动的最大数据条数                    
 
 **示例**
-GET /api/v1/interest/query?symbol=.XBTINT&offset=1558079160000&forward=true&maxCount=10
+`GET /api/v1/interest/query?symbol=.XBTINT&offset=1558079160000&forward=true&maxCount=10`
 
 ## 类型说明 
 ### 时间戳 
-API中的所有时间戳以Unix时间戳毫秒为单位返回（如：**546658861000**）
+API中的所有时间戳以Unix时间戳毫秒为单位返回（如：`1558079160000`）
 
 ## 接口认证
 ### 创建API KEY
 通过接口进行请求前，您需在Web端创建API-KEY。创建成功后，您需妥善保管好以下三条信息：
 
 
-* Key
-* Secret
-* Passphrase
+* `Key`
+* `Secret`
+* `Passphrase`
 
-Key和Secret由KuCoin Futures随机生成并提供，Passphrase是您在创建API时使用的密码。以上信息若遗失将无法恢复，需要重新申请API KEY。
+`Key`和`Secret`由KuCoin Futures随机生成并提供，`Passphrase`是您在创建API时使用的密码。以上信息若遗失将无法恢复，需要重新申请API KEY。
 
 
 ### 权限
@@ -474,20 +469,20 @@ Key和Secret由KuCoin Futures随机生成并提供，Passphrase是您在创建AP
 您可在[KuCoin Futures](https://futures.kucoin.com) Web端管理API权限。API权限分为以下几类：
 
 
-* **通用权限** - 开启后，API可使用大部分GET请求来获取数据。
-* **交易权限** - 开启后，可通过API进行下单/撤单和管理仓位。
-* **转账权限** - 开启后，可通过API进行提现。需注意，开启此权限后，不需要两步验证，即可进行转账。
+* `通用权限` - 开启后，API可使用大部分GET请求来获取数据。
+* `交易权限` - 开启后，可通过API进行下单/撤单和管理仓位。
+* `转账权限` - 开启后，可通过API进行提现。需注意，开启此权限后，不需要两步验证，即可进行转账。
 
 
 ### 创建请求
 
 所有REST参数的请求头需包含以下内容：
 
-* **KC-API-KEY** API KEY是字符串类型。
-* **KC-API-SIGN** 签名（请查看“消息签名”，了解更多详情）
-* **KC-API-TIMESTAMP** 请求的时间戳
-* **KC-API-PASSPHRASE** 创建API时填写的API密码
-* **KC-API-KEY-VERSION** API-KEY版本号，可通过[API管理](https://futures.kucoin.com/api)页面查看版本号
+* `KC-API-KEY` API KEY是字符串类型。
+* `KC-API-SIGN` 签名（请查看“消息签名”，了解更多详情）
+* `KC-API-TIMESTAMP` 请求的时间戳
+* `KC-API-PASSPHRASE` 创建API时填写的API密码
+* `KC-API-KEY-VERSION` API-KEY版本号，可通过[API管理](https://futures.kucoin.com/api)页面查看版本号
 
 
 ### 消息签名
@@ -559,25 +554,24 @@ Key和Secret由KuCoin Futures随机生成并提供，Passphrase是您在创建AP
     print(response.status_code)
     print(response.json())
 ```
-请求头中的 **KC-API-SIGN**: 
+#### 请求头中的 `KC-API-SIGN`
+    1. 使用 API的`Secret` 对`timestamp + method+ endpoint + body`拼接的字符串进行`HMAC-sha256`加密（`+`表示字符串连接）。
+    1. 再将加密内容使用 `base64` 编码。              
 
-1. 使用 API-Secret 对
-{timestamp + method+ endpoint + body} 拼接的字符串进行**HMAC-sha256**加密。
-2. 再将加密内容使用 **base64** 编码。
-                       
-
-请求头中的 **KC-API-PASSPHRASE**:
-
-1. 对于V1版的API-KEY，请使用明文传递
-2. 对于V2版的API-KEY，需要将KC-API-KEY-VERSION指定为2，并将passphrase使用API-Secret进行**HMAC-sha256**加密，再将加密内容通过**base64**编码后传递
+#### 请求头中的`KC-API-PASSPHRASE`
+    1. 对于V1版的API-KEY，请使用明文传递
+    1. 对于V2版的API-KEY，需要将`KC-API-KEY-VERSION`指定为`2`，并将passphrase使用API的Secret进行`HMAC-sha256`加密，再将加密内容通过`base64`编码后传递
 
 注意：
+1. 加密的 `timestamp` 需要和请求头中的`KC-API-TIMESTAMP`保持一致
+2. 进行加密的`body`需要和`Request Body`中的内容保持一致
+3. 请求方法需要大写
+4. 对于 `GET`, `DELETE` 请求，endpoint 需要包含请求的参数（`/api/v1/deposit-address?currency=XBT`）。如果没有请求体（通常用于GET请求），请使用空字符串“”表示请求体
 
-* 加密的 timestamp 需要和请求头中的KC-API-TIMESTAMP保持一致
-* 进行加密的body需要和Request Body中的内容保持一致
-* 请求方法需要大写
-* 对于 GET, DELETE 请求，endpoint 需要包含请求的参数（/api/v1/deposit-address?currency=XBT）。如果没有请求体（通常用于GET请求），请使用空字符串“”表示请求体
 
+#### 请求头中的`KC-API-TIMESTAMP``:
+请求头的`KC-API-TIMESTAMP`必须为Unix UTC时间，需精确到毫秒（如：`1547015186532`）。
+服务器请求的时间戳与API服务器时差必须控制在`5`秒以内，否则请求会因过期而被服务器拒绝。如果服务器与API服务器之间存在时间偏差，请使用平台提供的服务器时间接口，获取API服务器的时间。
 
 ```python
 #Example for Create Deposit Address
@@ -647,12 +641,6 @@ KC-API-SIGN = 7QP/oM0ykidMdrfNEUmng8eZjg/ZvPafjIqmxiVfYu4=
 <br/>
 
 ----------
-
-### 选择时间戳
-
-请求头的**KC-API-TIMESTAMP**必须为Unix UTC时间，需精确到毫秒（如：1547015186532）。
-
-服务器请求的时间戳与API服务器时差必须控制在**5秒**以内，否则请求会因过期而被服务器拒绝。如果服务器与API服务器之间存在时间偏差，请使用平台提供的服务器时间接口，获取API服务器的时间。
 
 
 ## 枚举定义
@@ -1253,7 +1241,7 @@ payAccountType|String|YES|付款账户类型：只能是`MAIN`-储蓄账户，`T
 * `clientTimestamp`和`allowMaxTimeWindow`参数说明：当这两个参数`同时`传递才会生效
       * 验证逻辑：
           * 1. 服务器接收到请求时间: `receiveTime`
-          * 2. 服务器接收到请求时间(`receiveTime`)与客户端下单时间(`clientTimestamp`)间隔:`receiveTime` - `clientTimestamp` = `timeWindow``
+          * 2. 服务器接收到请求时间(`receiveTime`)与客户端下单时间(`clientTimestamp`)间隔:`receiveTime` - `clientTimestamp` = `timeWindow`
           * 3. 当`clientTimestamp` <= `receiveTime`同时`timeWindow` <= `allowMaxTimeWindow`时，下单请求才会被接受,否则下单失败返回错误码`300019`
 <br/><br/>
 
@@ -1385,15 +1373,57 @@ orderIds | 成功撤掉的订单id
 
 
 ## 查询单个订单详情
+``` json
+{
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "id": "31744981194510336",
+        "symbol": "LINKUSDTM",
+        "size": 2020,
+        "orderType": "LIMIT",
+        "placeType": "DEFAULT",
+        "side": "SELL",
+        "price": "12.5930000000",
+        "dealSize": 911,
+        "reduceOnly": false,
+        "workingType": null,
+        "orderTime": "1651040593311",
+        "stopPrice": "0.0000000000",
+        "takeProfitPrice": "0.0000000000",
+        "orderDisplayType": "LIMIT",
+        "leverage": null,
+        "timeInForce": "GTC",
+        "hidden": false,
+        "visibleSize": 0,
+        "updatedAt": null,
+        "status": "MATCHING",
+        "cancelSize": 0,
+        "dealValue": "1147.2223000000",
+        "postOnly": false,
+        "closeOrder": false,
+        "fromReduce": false,
+        "settlementCurrency": null,
+        "createdAt": 1651040593311
+    }
+}
+```
 ### HTTP请求
 `GET /api/v2/order/detail`
 ### API权限
 该接口需要`通用权限`
 ### 参数
-| 参数     | 数据类型 | 含义 |
-| :------- | -------- | -- |
-| orderId | String |	 订单ID |
-| clientOid | String | 用户自定义orderId |
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+orderId | STRING | NO | 订单id 
+clientOid | STRING | NO | 用户自定义orderId 
+
+<aside class="notice">
+<code>orderId</code>和<code>clientOid</code>二选一，如果都传，默认使用<code>orderId</code>.
+</aside>
+
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1426,6 +1456,51 @@ orderIds | 成功撤掉的订单id
 
 
 ## 查询活跃订单
+``` json
+{
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "data": {
+        "currentPage": 1,
+        "pageSize": 50,
+        "totalNum": "1",
+        "totalPage": 1,
+        "items": [
+            {
+                "id": "31744981194510336",
+                "symbol": "LINKUSDTM",
+                "size": 2020,
+                "orderType": "LIMIT",
+                "placeType": "DEFAULT",
+                "side": "SELL",
+                "price": "12.5930000000",
+                "dealSize": 894,
+                "reduceOnly": false,
+                "workingType": null,
+                "orderTime": "1651040593311",
+                "stopPrice": "0.0000000000",
+                "takeProfitPrice": "0.0000000000",
+                "orderDisplayType": "LIMIT",
+                "leverage": null,
+                "timeInForce": "GTC",
+                "hidden": false,
+                "visibleSize": 0,
+                "updatedAt": null,
+                "status": "MATCHING",
+                "cancelSize": 0,
+                "dealValue": "1125.8142000000",
+                "postOnly": false,
+                "closeOrder": false,
+                "fromReduce": false,
+                "settlementCurrency": null,
+                "createdAt": 1651040593311
+            }
+        ]
+    }
+}
+``` 
 ### HTTP请求
 `GET /api/v2/orders/active`
 ### API权限
@@ -1467,6 +1542,45 @@ orderIds | 成功撤掉的订单id
 
 
 ## 查询全部活跃订单
+```json
+{
+    "success": true,
+    "code": "200",
+    "msg": "success",
+    "retry": false,
+    "items": [
+        {
+            "id": "31744981194510336",
+            "symbol": "LINKUSDTM",
+            "size": 2020,
+            "orderType": "LIMIT",
+            "placeType": "DEFAULT",
+            "side": "SELL",
+            "price": "12.5930000000",
+            "dealSize": 894,
+            "reduceOnly": false,
+            "workingType": null,
+            "orderTime": "1651040593311",
+            "stopPrice": "0.0000000000",
+            "takeProfitPrice": "0.0000000000",
+            "orderDisplayType": "LIMIT",
+            "leverage": null,
+            "timeInForce": "GTC",
+            "hidden": false,
+            "visibleSize": 0,
+            "updatedAt": null,
+            "status": "MATCHING",
+            "cancelSize": 0,
+            "dealValue": "1125.8142000000",
+            "postOnly": false,
+            "closeOrder": false,
+            "fromReduce": false,
+            "settlementCurrency": null,
+            "createdAt": 1651040593311
+        }
+    ]
+}
+```
 ### HTTP请求
 `GET /api/v2/orders/all-active`
 ### API权限
@@ -1546,13 +1660,14 @@ orderIds | 成功撤掉的订单id
 ### API权限
 该接口需要`通用权限`
 ### 参数
-| 参数     | 数据类型 | 含义 |
-| :------- | -------- | ---------- |
-| symbol | String | 合约symbol	|
-| startAt | Long  | 开始时间（毫秒）	|
-| endAt | Long  | 截止时间（毫秒）	|
-| fromId | Long | [可选] 从哪一条成交id开始返回.	|
-| limit | Integer | 默认 `50`; 最大 `1000`.	|
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| symbol | String | YES | 合约symbol	|
+| startAt | Long  | NO | 开始时间（毫秒）	|
+| endAt | Long  | NO | 截止时间（毫秒）	|
+| fromId | Long | NO | 从哪一条成交id开始返回.|
+| limit | Integer | NO | 默认 `50`; 最大 `1000`.|
+
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -1976,20 +2091,20 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
                 "settleCurrency": "USDT"
             }
         ],
-        "hasMore": true
     }
 }
 ```
 ### HTTP请求
 `GET /api/v2/funding-history`
 ### 参数
-| 参数    | 数据类型 | 含义                                                  |
-| :------ | -------- | ------------------------------ |
-| symbol  | String   | 合约symbol                                            |
-| startAt | Long     | [可选] 开始时间（毫秒）                               |
-| endAt   | Long     | [可选] 截止时间（毫秒）                               |
-| limit   | Integer  | 默认 `50`; 最大 `1000`.                             |
-| fromId  | Long     | [可选] 从哪一条成交`id`开始返回. 缺省返回最近的成交记录 |
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| symbol | String | YES | 合约symbol	|
+| startAt | Long  | NO | 开始时间（毫秒）	|
+| endAt | Long  | NO | 截止时间（毫秒）	|
+| fromId | Long | NO | 从哪一条成交id开始返回.缺省返回最近的资金费用结算历史|
+| limit | Integer | NO | 默认 `50`; 最大 `1000`.|
+
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -2003,7 +2118,6 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 | entryValue | 结算时的仓位价值 |
 | funding | 结算的资金费用，正数表示收入；负数表示支出 |
 | settleCurrency | 结算币种 |
-| hasMore | 是否还有下一页 |
 
 ## 获取合约K线数据
 ```json
@@ -2027,12 +2141,12 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 ### HTTP请求
 `GET /api/v2/kline/query`
 ### 参数
-| 参数     | 数据类型 | 含义  |
-| :------- | -------- | -----|
-| from   |  Long  | 起始时间（毫秒） |
-| to   | Long | 结束时间（毫秒） |
-| granularity   | Integer   | 代表分钟数，可选范围：`1`,`5`,`15`,`30`,`60`,`120`,`240`,`480`,`720`,`1440`,`10080` |
-| symbol   | String   | 合约symbol |
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| granularity   | Integer   | YES | 代表分钟数，可选范围：`1`,`5`,`15`,`30`,`60`,`120`,`240`,`480`,`720`,`1440`,`10080` |
+| symbol   | String   | YES | 合约symbol |
+| from   |  Long  | NO | 起始时间（毫秒） |
+| to   | Long | NO | 结束时间（毫秒） |
 
 ## 查询资金费率列表
 ```json
@@ -2057,13 +2171,13 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 ### HTTP请求
 `GET /api/v2/contract/{symbol}/funding-rates`
 ### 参数
-| 参数     | 数据类型 | 含义 |
-| :------- | -------- | --------- |
-| symbol   | String   | 合约symbol |
-| startAt | Long   | 开始时间 |
-| endAt | Long   | 结束时间 |
-| fromId | Long | [可选] 从哪一条成交`id`开始返回.	|
-| limit | Integer | 默认 `50`; 最大 `1000`.	|
+参数 | 数据类型 | 是否必须 | 含义 
+--------- | ------- | -----------| -----------
+| symbol | String | YES | 合约symbol	|
+| startAt | Long  | NO | 开始时间（毫秒）	|
+| endAt | Long  | NO | 截止时间（毫秒）	|
+| fromId | Long | NO | 从哪一条成交id开始返回.缺省返回最近的资金费率列表|
+| limit | Integer | NO | 默认 `50`; 最大 `1000`.|
 ### 返回值
 | 字段   | 含义   |
 | ------ | ------ |
@@ -2072,6 +2186,31 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
 | timePoint | 时间点(毫秒) |
 | value | 资金费率 |
 
+## 查询合约标记价格
+```json
+{
+"code": "200000",
+"data": {
+"symbol": "BTCUSDTM",
+"timePoint": "1651202804000",
+"value": "39504.65",
+"indexPrice": "39520.09"
+}
+}
+```
+### HTTP请求
+`GET /api/v2/mark-price/{symbol}/current`
+### 参数
+参数 | 数据类型 | 是否必须 | 含义 |
+--------- | ------- | -----------| -----------|
+symbol | String | 是 | 合约symbol
+### 返回值
+属性 | 含义 |
+--------- | -----------|
+symbol | 合约symbol |
+timePoint | 时间点, 以毫秒为单位 |
+value | 标记价格值 |
+indexPrice | indexPrice |
 
 # 委托买卖盘
 
@@ -3091,5 +3230,6 @@ Topic: `futuresPosition/position`
 <br/>
 <br/>
 <br/>
+
 # 登录 KuCoin
 <a href="https://www.kucoin.com">登录 KuCoin</a>

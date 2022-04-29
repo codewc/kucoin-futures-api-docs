@@ -1945,7 +1945,6 @@ maintenanceMarginRate | 仓位价值处于该等级限额时，用到的维持�
                 "settleCurrency": "USDT"
             }
         ],
-        "hasMore": true
     }
 }
 ```
@@ -1972,7 +1971,6 @@ Field | Description
 | entryValue | 结算时的仓位价值 |
 | funding | 结算的资金费用，正数表示收入；负数表示支出 |
 | settleCurrency | 结算币种 |
-| hasMore | 是否还有下一页 |
 
 ## 获取合约K线数据
 ```json
@@ -3028,5 +3026,6 @@ Topic: `futuresPosition/position`
 <br/>
 <br/>
 <br/>
+
 # Sign Up for KuCoin
 <a href="https://www.kucoin.com">Sign Up for KuCoin</a>
